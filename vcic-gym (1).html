@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCIC Deal Memo Gym</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --surface-alt: #F5F4F0;
+    --border: #E8E6E1;
+    --border-light: #F0EEEA;
+    --text: #1A1A18;
+    --text-secondary: #6B6963;
+    --text-tertiary: #9C9890;
+    --accent: #2D5A27;
+    --accent-light: #E8F0E6;
+    --accent-hover: #3D7A35;
+    --red: #8B3A3A;
+    --red-light: #F5EAEA;
+    --amber: #7A6420;
+    --amber-light: #F5F0E0;
+    --blue: #2A4A6B;
+    --blue-light: #E6EEF5;
+    --serif: 'Instrument Serif', Georgia, serif;
+    --sans: 'DM Sans', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ────────────────────────────── */
+  .app { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+
+  .header {
+    padding: 48px 0 40px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .header h1 {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .header-sub {
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+    margin-top: 6px;
+    font-weight: 300;
+  }
+
+  .header-right { text-align: right; }
+
+  /* ── Timer ─────────────────────────────── */
+  .timer-display {
+    font-family: var(--mono);
+    font-size: 2rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: 0.02em;
+    transition: color 0.3s;
+  }
+  .timer-display.warning { color: var(--amber); }
+  .timer-display.danger { color: var(--red); }
+
+  .timer-label {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 4px;
+  }
+
+  .timer-controls { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+  .timer-btn {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+  }
+  .timer-btn:hover { border-color: var(--text-tertiary); color: var(--text); }
+
+  /* ── Sections ──────────────────────────── */
+  .section {
+    margin-bottom: 56px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .section-title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  .section-badge {
+    font-size: 0.68rem;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+  }
+
+  /* ── Cards ─────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-flush {
+    background: none;
+    border: none;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  /* ── Case Packet ───────────────────────── */
+  .case-content {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    font-family: var(--sans);
+    font-weight: 300;
+  }
+
+  .case-placeholder {
+    text-align: center;
+    padding: 64px 32px;
+    color: var(--text-tertiary);
+    font-size: 0.9rem;
+  }
+
+  .case-placeholder p { margin-bottom: 24px; font-weight: 300; }
+
+  /* ── API Setup ─────────────────────────── */
+  .api-setup {
+    background: var(--surface-alt);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    margin-bottom: 32px;
+  }
+
+  .api-setup-title {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-tertiary);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+
+  .api-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .api-input {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .api-input:focus { border-color: var(--accent); }
+  .api-input::placeholder { color: var(--text-tertiary); }
+
+  .api-status {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-top: 8px;
+    font-weight: 300;
+  }
+  .api-status.connected { color: var(--accent); }
+
+  /* ── Buttons ───────────────────────────── */
+  .btn {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 400;
+    padding: 11px 24px;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.01em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--text);
+    color: var(--bg);
+  }
+  .btn-primary:hover { background: #333; }
+  .btn-primary:disabled {
+    background: var(--border);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--text-tertiary); }
+
+  .btn-accent {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-accent:hover { background: var(--accent-hover); }
+  .btn-accent:disabled {
+    background: var(--border);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+  }
+
+  .btn-ghost {
+    background: none;
+    color: var(--text-secondary);
+    padding: 8px 16px;
+  }
+  .btn-ghost:hover { color: var(--text); background: var(--surface-alt); }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* ── Textareas ─────────────────────────── */
+  .memo-group { margin-bottom: 28px; }
+
+  .memo-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 8px;
+    display: block;
+    letter-spacing: 0.01em;
+  }
+
+  .memo-label span {
+    font-weight: 300;
+    color: var(--text-tertiary);
+    margin-left: 6px;
+  }
+
+  .memo-textarea {
+    width: 100%;
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    font-weight: 300;
+    line-height: 1.7;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text);
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    min-height: 80px;
+  }
+  .memo-textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+  }
+  .memo-textarea::placeholder {
+    color: var(--text-tertiary);
+    font-weight: 300;
+  }
+
+  /* ── Feedback ──────────────────────────── */
+  .feedback-content {
+    font-size: 0.9rem;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    font-weight: 300;
+  }
+
+  .feedback-placeholder {
+    text-align: center;
+    padding: 48px 32px;
+    color: var(--text-tertiary);
+    font-size: 0.88rem;
+    font-weight: 300;
+  }
+
+  /* ── Collapsible ───────────────────────── */
+  .collapsible-toggle {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    padding: 12px 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border-light);
+  }
+  .collapsible-toggle:hover { color: var(--text); }
+
+  .collapsible-toggle .arrow {
+    transition: transform 0.2s;
+    font-size: 0.7rem;
+  }
+  .collapsible-toggle.open .arrow { transform: rotate(90deg); }
+
+  .collapsible-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .collapsible-body.open { max-height: 5000px; }
+  .collapsible-inner { padding: 16px 0 24px; }
+
+  /* ── Loading ───────────────────────────── */
+  .loading-dots::after {
+    content: '';
+    animation: dots 1.4s steps(4) infinite;
+  }
+  @keyframes dots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+  }
+
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Phase indicator ───────────────────── */
+  .phases {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 48px;
+  }
+  .phase {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background 0.3s;
+  }
+  .phase.active { background: var(--accent); }
+  .phase.done { background: var(--text); }
+
+  .phase-labels {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .phase-label {
+    flex: 1;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-tertiary);
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+  .phase-label.active { color: var(--accent); }
+  .phase-label.done { color: var(--text); }
+
+  /* ── Difficulty selector ───────────────── */
+  .diff-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .diff-chip {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .diff-chip:hover { border-color: var(--text-tertiary); }
+  .diff-chip.selected {
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+
+  /* ── Footer ────────────────────────────── */
+  .footer {
+    padding: 48px 0 64px;
+    border-top: 1px solid var(--border-light);
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Responsive ────────────────────────── */
+  @media (max-width: 640px) {
+    .header { padding: 32px 0 28px; flex-direction: column; align-items: flex-start; gap: 20px; }
+    .header-right { text-align: left; }
+    .header h1 { font-size: 1.8rem; }
+    .card { padding: 24px; }
+    .api-row { flex-direction: column; }
+    .btn-row { flex-direction: column; }
+    .btn { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div>
+      <h1>Deal Memo Gym</h1>
+      <p class="header-sub">VCIC Competition Simulator</p>
+    </div>
+    <div class="header-right">
+      <p class="timer-label">Time Remaining</p>
+      <div id="timer" class="timer-display">08:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn" onclick="startTimer()">Start</button>
+        <button class="timer-btn" onclick="pauseTimer()">Pause</button>
+        <button class="timer-btn" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Phase Progress -->
+  <div class="phase-labels">
+    <div id="pl1" class="phase-label active">1. Generate</div>
+    <div id="pl2" class="phase-label">2. Draft Memo</div>
+    <div id="pl3" class="phase-label">3. Score</div>
+    <div id="pl4" class="phase-label">4. Review</div>
+  </div>
+  <div class="phases">
+    <div id="p1" class="phase active"></div>
+    <div id="p2" class="phase"></div>
+    <div id="p3" class="phase"></div>
+    <div id="p4" class="phase"></div>
+  </div>
+
+  <!-- API Setup -->
+  <section class="section" id="apiSection">
+    <div class="api-setup">
+      <div class="api-setup-title">Anthropic API Key</div>
+      <div class="api-row">
+        <input type="password" class="api-input" id="apiKey" placeholder="sk-ant-..." autocomplete="off">
+        <button class="btn btn-secondary" onclick="saveApiKey()">Save</button>
+      </div>
+      <p class="api-status" id="apiStatus">Key stored locally in your browser. Never sent anywhere except api.anthropic.com.</p>
+    </div>
+  </section>
+
+  <!-- Stage + Generate -->
+  <section class="section" id="generateSection">
+    <div class="section-header">
+      <h2 class="section-title">New Rep</h2>
+      <span class="section-badge" id="repCounter">Rep #1</span>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <p style="font-size: 0.8rem; color: var(--text-tertiary); margin-bottom: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em;">Stage</p>
+      <div class="diff-row">
+        <button class="diff-chip selected" data-stage="Seed" onclick="selectStage(this)">Seed</button>
+        <button class="diff-chip" data-stage="Series A" onclick="selectStage(this)">Series A</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <p style="font-size: 0.8rem; color: var(--text-tertiary); margin-bottom: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em;">Sector</p>
+      <div class="diff-row" style="flex-wrap: wrap;">
+        <button class="diff-chip selected" data-sector="Random" onclick="selectSector(this)">Random</button>
+        <button class="diff-chip" data-sector="SaaS" onclick="selectSector(this)">SaaS</button>
+        <button class="diff-chip" data-sector="Marketplace" onclick="selectSector(this)">Marketplace</button>
+        <button class="diff-chip" data-sector="Fintech" onclick="selectSector(this)">Fintech</button>
+        <button class="diff-chip" data-sector="Consumer" onclick="selectSector(this)">Consumer</button>
+        <button class="diff-chip" data-sector="Deeptech" onclick="selectSector(this)">Deeptech</button>
+      </div>
+    </div>
+
+    <button class="btn btn-accent" id="generateBtn" onclick="generateCase()">
+      Generate Case Packet
+    </button>
+  </section>
+
+  <!-- Mini Case Packet -->
+  <section class="section" id="caseSection" style="display:none;">
+    <div class="section-header">
+      <h2 class="section-title">Mini Case Packet</h2>
+      <span class="section-badge">60-120 sec read</span>
+    </div>
+    <div class="card">
+      <div id="caseContent" class="case-content"></div>
+    </div>
+  </section>
+
+  <!-- Memo -->
+  <section class="section" id="memoSection" style="display:none;">
+    <div class="section-header">
+      <h2 class="section-title">Your Investment Memo</h2>
+      <span class="section-badge">8 min target</span>
+    </div>
+
+    <div class="card">
+      <div class="memo-group">
+        <label class="memo-label">A. Recommendation <span>Invest / Pass / Needs More Data</span></label>
+        <textarea class="memo-textarea" id="memoA" rows="2" placeholder="One-line recommendation with conviction..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">B. Investment Thesis <span>3 bullets</span></label>
+        <textarea class="memo-textarea" id="memoB" rows="4" placeholder="Three core reasons to back this company..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">C. Market & Timing</label>
+        <textarea class="memo-textarea" id="memoC" rows="3" placeholder="TAM/SAM/SOM, why now, market dynamics..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">D. Product & Defensibility</label>
+        <textarea class="memo-textarea" id="memoD" rows="3" placeholder="Moat, switching costs, network effects..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">E. Traction & Unit Economics</label>
+        <textarea class="memo-textarea" id="memoE" rows="3" placeholder="Revenue, growth, CAC/LTV, margins..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">F. Team Assessment</label>
+        <textarea class="memo-textarea" id="memoF" rows="3" placeholder="Founder-market fit, gaps, red flags..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">G. Key Risks <span>Ranked + kill criteria</span></label>
+        <textarea class="memo-textarea" id="memoG" rows="5" placeholder="Ranked risks, mitigation, what kills the deal..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">H. Valuation & Ownership</label>
+        <textarea class="memo-textarea" id="memoH" rows="3" placeholder="Pre/post, ownership %, fund math..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">I. Deal Terms Stance</label>
+        <textarea class="memo-textarea" id="memoI" rows="3" placeholder="Liquidation pref, pro-rata, board seat..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">J. What Must Be True / What Could Go Wrong <span>3 each</span></label>
+        <textarea class="memo-textarea" id="memoJ" rows="4" placeholder="Three conditions for success, three failure modes..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">K. Diligence Questions <span>10, prioritized</span></label>
+        <textarea class="memo-textarea" id="memoK" rows="6" placeholder="Ranked by impact on investment decision..."></textarea>
+      </div>
+
+      <div class="memo-group">
+        <label class="memo-label">L. IC / Judge Q&A Prep</label>
+        <textarea class="memo-textarea" id="memoL" rows="4" placeholder="Anticipated tough questions and your answers..."></textarea>
+      </div>
+
+      <div class="btn-row" style="margin-top: 8px;">
+        <button class="btn btn-accent" id="submitBtn" onclick="submitMemo()">Submit for Scoring</button>
+        <button class="btn btn-ghost" onclick="clearMemo()">Clear All</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Score & Feedback -->
+  <section class="section" id="feedbackSection" style="display:none;">
+    <div class="section-header">
+      <h2 class="section-title">Score & Feedback</h2>
+      <span class="section-badge" id="feedbackBadge">Scoring</span>
+    </div>
+
+    <div class="card" id="scoringCard">
+      <div id="feedbackContent" class="feedback-content"></div>
+    </div>
+
+    <!-- Gold Standard (collapsible) -->
+    <div id="goldSection" style="display:none; margin-top: 16px;">
+      <button class="collapsible-toggle" onclick="toggleCollapsible(this)">
+        Gold Standard Memo
+        <span class="arrow">&#9654;</span>
+      </button>
+      <div class="collapsible-body">
+        <div class="collapsible-inner">
+          <div id="goldContent" class="feedback-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Red Team Q&A (collapsible) -->
+    <div id="redTeamSection" style="display:none; margin-top: 4px;">
+      <button class="collapsible-toggle" onclick="toggleCollapsible(this)">
+        Red Team Judge Q&A
+        <span class="arrow">&#9654;</span>
+      </button>
+      <div class="collapsible-body">
+        <div class="collapsible-inner">
+          <div id="redTeamContent" class="feedback-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Micro Drills (collapsible) -->
+    <div id="drillsSection" style="display:none; margin-top: 4px;">
+      <button class="collapsible-toggle" onclick="toggleCollapsible(this)">
+        Micro-Drills
+        <span class="arrow">&#9654;</span>
+      </button>
+      <div class="collapsible-body">
+        <div class="collapsible-inner">
+          <div id="drillsContent" class="feedback-content"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row" style="margin-top: 32px;">
+      <button class="btn btn-primary" onclick="newRep()">New Rep</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    VCIC Deal Memo Gym &middot; All cases are fictional &middot; Powered by Claude API
+  </footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// State
+// ══════════════════════════════════════════
+let repCount = 1;
+let selectedStage = 'Seed';
+let selectedSector = 'Random';
+let timerInterval = null;
+let timeLeft = 480;
+let timerRunning = false;
+let currentCaseText = '';
+
+// ══════════════════════════════════════════
+// API Key Management
+// ══════════════════════════════════════════
+function saveApiKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (key) {
+    localStorage.setItem('anthropic_api_key', key);
+    const status = document.getElementById('apiStatus');
+    status.textContent = 'Key saved successfully.';
+    status.className = 'api-status connected';
+  }
+}
+
+function getApiKey() {
+  return localStorage.getItem('anthropic_api_key') || '';
+}
+
+// Restore key on load
+window.addEventListener('load', () => {
+  const saved = getApiKey();
+  if (saved) {
+    document.getElementById('apiKey').value = saved;
+    const status = document.getElementById('apiStatus');
+    status.textContent = 'Key loaded from storage.';
+    status.className = 'api-status connected';
+  }
+});
+
+// ══════════════════════════════════════════
+// Selectors
+// ══════════════════════════════════════════
+function selectStage(el) {
+  document.querySelectorAll('[data-stage]').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedStage = el.dataset.stage;
+}
+
+function selectSector(el) {
+  document.querySelectorAll('[data-sector]').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSector = el.dataset.sector;
+}
+
+// ══════════════════════════════════════════
+// Timer
+// ══════════════════════════════════════════
+function updateTimerDisplay() {
+  const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+  const s = String(timeLeft % 60).padStart(2, '0');
+  const el = document.getElementById('timer');
+  el.textContent = `${m}:${s}`;
+  el.className = 'timer-display' + (timeLeft <= 60 ? ' danger' : timeLeft <= 180 ? ' warning' : '');
+}
+
+function startTimer() {
+  if (timerRunning) return;
+  timerRunning = true;
+  timerInterval = setInterval(() => {
+    if (timeLeft > 0) { timeLeft--; updateTimerDisplay(); }
+    else { pauseTimer(); }
+  }, 1000);
+}
+
+function pauseTimer() {
+  timerRunning = false;
+  clearInterval(timerInterval);
+}
+
+function resetTimer() {
+  pauseTimer();
+  timeLeft = 480;
+  updateTimerDisplay();
+}
+
+// ══════════════════════════════════════════
+// Phase Management
+// ══════════════════════════════════════════
+function setPhase(num) {
+  for (let i = 1; i <= 4; i++) {
+    const p = document.getElementById('p' + i);
+    const l = document.getElementById('pl' + i);
+    p.className = 'phase' + (i < num ? ' done' : i === num ? ' active' : '');
+    l.className = 'phase-label' + (i < num ? ' done' : i === num ? ' active' : '');
+  }
+}
+
+// ══════════════════════════════════════════
+// System Prompt for Case Generation
+// ══════════════════════════════════════════
+const SYSTEM_PROMPT = `You are the "VCIC Deal Memo Gym" engine. You generate high-pressure VCIC practice reps.
+
+IMPORTANT OUTPUT RULES:
+- Plain text and bullets only
+- No markdown formatting (no **, no ##, no \`\`\`)
+- No emojis
+- Use ALL CAPS for section headings
+- Use simple dashes (-) for bullet points
+- Every section must be self-contained and clearly labeled
+
+You have deep knowledge of VC frameworks, terminology, valuation logic, diligence categories, term sheet norms, and market sizing logic.
+
+You also cover:
+- Fund strategy, portfolio construction, power-law logic, ownership targets, reserve strategy, return scenarios, fund impact math
+- IC decision-making, judge psychology, communication clarity, memo structure under time pressure, live defense strategy
+
+CONVICTION RULE: Force explicit prioritization. Rank risks by severity. Rank diligence questions by impact. Separate core thesis vs supporting points. If everything sounds equally important, treat it as a failure.
+
+JUDGE AWARENESS: When evaluating, explicitly label "Scores points", "Neutral", "Loses points". Penalize hedgy language, lack of prioritization, weak ownership math, unclear conviction.`;
+
+// ══════════════════════════════════════════
+// API Calls
+// ══════════════════════════════════════════
+async function callClaude(messages, onChunk) {
+  const key = getApiKey();
+  if (!key) {
+    alert('Please enter your Anthropic API key first.');
+    return null;
+  }
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      stream: true,
+      messages: messages
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`API Error ${response.status}: ${err}`);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let fullText = '';
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const data = line.slice(6);
+        if (data === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            fullText += parsed.delta.text;
+            if (onChunk) onChunk(fullText);
+          }
+        } catch (e) { /* skip */ }
+      }
+    }
+  }
+
+  return fullText;
+}
+
+// ══════════════════════════════════════════
+// Generate Case
+// ══════════════════════════════════════════
+async function generateCase() {
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Generating case...';
+
+  const sector = selectedSector === 'Random'
+    ? ['SaaS', 'Marketplace', 'Fintech', 'Consumer', 'Deeptech'][Math.floor(Math.random() * 5)]
+    : selectedSector;
+
+  const prompt = `Generate Rep #${repCount} Mini Case Packet.
+
+Stage: ${selectedStage}
+Sector: ${sector}
+
+Include ALL of the following clearly labeled sections:
+
+COMPANY SNAPSHOT: Name, Sector, Product, ICP, Business model
+
+MARKET: TAM/SAM/SOM with assumptions, Market growth rate, Clear "why now" catalyst
+
+TRACTION: Revenue or pilots, Growth rate, Retention/churn/NRR (if relevant), Sales cycle and pipeline signal
+
+UNIT ECONOMICS: CAC, LTV, Payback period, Gross margin, Burn rate, Runway
+
+COMPETITION: 3 competitors with positioning and differentiation
+
+TEAM: Founder backgrounds, Founder-market fit signal, One subtle red flag
+
+CAP TABLE & FINANCING: Current ownership, SAFEs/notes (if any), Option pool implications
+
+ROUND DETAILS: Amount raised, Pre-money and post-money valuation, Use of proceeds
+
+DATA ROOM EXCERPTS: 5 bullets each hinting at a different risk
+
+MESSY DATA POINT: One conflicting or ambiguous data point that should be flagged
+
+After the case, print the memo template (A-L) exactly, then stop. Do NOT generate a sample memo.
+
+MEMO TEMPLATE:
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep
+
+You have 8 minutes. Write your memo now.`;
+
+  try {
+    // Show case section
+    document.getElementById('caseSection').style.display = 'block';
+    document.getElementById('caseContent').textContent = 'Generating...';
+
+    const result = await callClaude(
+      [{ role: 'user', content: prompt }],
+      (partial) => {
+        document.getElementById('caseContent').textContent = partial;
+      }
+    );
+
+    if (result) {
+      currentCaseText = result;
+      document.getElementById('caseContent').textContent = result;
+      // Show memo section
+      document.getElementById('memoSection').style.display = 'block';
+      setPhase(2);
+      resetTimer();
+      // Scroll to case
+      document.getElementById('caseSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  } catch (e) {
+    document.getElementById('caseContent').textContent = 'Error: ' + e.message;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = 'Generate Case Packet';
+}
+
+// ══════════════════════════════════════════
+// Submit Memo
+// ══════════════════════════════════════════
+async function submitMemo() {
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Scoring...';
+
+  const sections = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+  const labels = [
+    'One-line recommendation',
+    '3-bullet investment thesis',
+    'Market & timing',
+    'Product & defensibility',
+    'Traction & unit economics',
+    'Team assessment',
+    'Key risks (ranked) + kill criteria',
+    'Valuation & ownership',
+    'Deal terms stance',
+    'What must be true / What could go wrong',
+    '10 prioritized diligence questions',
+    'IC / Judge Q&A prep'
+  ];
+
+  let memoText = 'Here is my investment memo:\n\n';
+  sections.forEach((s, i) => {
+    const val = document.getElementById('memo' + s).value.trim();
+    memoText += `${s}. ${labels[i]}:\n${val || '[LEFT BLANK]'}\n\n`;
+  });
+
+  const scoringPrompt = `${memoText}
+
+---
+
+The original case packet was:
+
+${currentCaseText}
+
+---
+
+Now return output in THIS EXACT ORDER with clear section headings in ALL CAPS:
+
+SECTION-BY-SECTION SCORES (A-L, 0-5)
+Score each section. Be harsh but fair. Briefly explain each score.
+
+JUDGE POV
+For each section, label: "Scores points" / "Neutral" / "Loses points"
+
+KEY WEAKNESSES (PRIORITIZED)
+List the most critical weaknesses ranked by severity.
+
+GOLD STANDARD VCIC MEMO (350-500 WORDS)
+Write the best possible memo for this case using the same A-L template.
+
+RED TEAM JUDGE QUESTIONS (6)
+Six tough questions a judge would ask, with the best possible answers.
+
+MICRO-DRILLS (3)
+Three targeted 2-minute practice exercises based on the weaknesses you identified.`;
+
+  try {
+    document.getElementById('feedbackSection').style.display = 'block';
+    document.getElementById('feedbackContent').textContent = 'Analyzing your memo...';
+    document.getElementById('feedbackBadge').textContent = 'Scoring';
+    setPhase(3);
+
+    const result = await callClaude(
+      [{ role: 'user', content: scoringPrompt }],
+      (partial) => {
+        document.getElementById('feedbackContent').textContent = partial;
+      }
+    );
+
+    if (result) {
+      // Parse sections for collapsibles
+      const goldMatch = result.match(/GOLD STANDARD[\s\S]*?(?=RED TEAM|$)/i);
+      const redTeamMatch = result.match(/RED TEAM[\s\S]*?(?=MICRO-DRILL|$)/i);
+      const drillsMatch = result.match(/MICRO-DRILL[\s\S]*$/i);
+
+      // Main feedback (scores + judge + weaknesses)
+      const mainEnd = result.search(/GOLD STANDARD/i);
+      const mainText = mainEnd > 0 ? result.substring(0, mainEnd) : result;
+      document.getElementById('feedbackContent').textContent = mainText.trim();
+
+      if (goldMatch) {
+        document.getElementById('goldSection').style.display = 'block';
+        document.getElementById('goldContent').textContent = goldMatch[0].trim();
+      }
+      if (redTeamMatch) {
+        document.getElementById('redTeamSection').style.display = 'block';
+        document.getElementById('redTeamContent').textContent = redTeamMatch[0].trim();
+      }
+      if (drillsMatch) {
+        document.getElementById('drillsSection').style.display = 'block';
+        document.getElementById('drillsContent').textContent = drillsMatch[0].trim();
+      }
+
+      document.getElementById('feedbackBadge').textContent = 'Complete';
+      setPhase(4);
+
+      document.getElementById('feedbackSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  } catch (e) {
+    document.getElementById('feedbackContent').textContent = 'Error: ' + e.message;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = 'Submit for Scoring';
+}
+
+// ══════════════════════════════════════════
+// Helpers
+// ══════════════════════════════════════════
+function clearMemo() {
+  ['A','B','C','D','E','F','G','H','I','J','K','L'].forEach(s => {
+    document.getElementById('memo' + s).value = '';
+  });
+}
+
+function newRep() {
+  repCount++;
+  document.getElementById('repCounter').textContent = `Rep #${repCount}`;
+  clearMemo();
+  currentCaseText = '';
+  resetTimer();
+
+  // Hide sections
+  document.getElementById('caseSection').style.display = 'none';
+  document.getElementById('memoSection').style.display = 'none';
+  document.getElementById('feedbackSection').style.display = 'none';
+  document.getElementById('goldSection').style.display = 'none';
+  document.getElementById('redTeamSection').style.display = 'none';
+  document.getElementById('drillsSection').style.display = 'none';
+  document.getElementById('feedbackContent').textContent = '';
+
+  setPhase(1);
+  // Alternate stage
+  if (selectedStage === 'Seed') {
+    selectStage(document.querySelector('[data-stage="Series A"]'));
+  } else {
+    selectStage(document.querySelector('[data-stage="Seed"]'));
+  }
+
+  document.getElementById('generateSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleCollapsible(btn) {
+  btn.classList.toggle('open');
+  const body = btn.nextElementSibling;
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>
