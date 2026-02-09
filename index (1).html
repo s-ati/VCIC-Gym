@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VCIC Deal Memo Gym</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FAFAF8;
+  --surface: #FFFFFF;
+  --surface-alt: #F5F4F0;
+  --border: #E8E6E1;
+  --border-light: #F0EEEA;
+  --text: #1A1A18;
+  --text-secondary: #6B6963;
+  --text-tertiary: #9C9890;
+  --accent: #2D5A27;
+  --accent-light: #E8F0E6;
+  --accent-hover: #3D7A35;
+  --red: #8B3A3A;
+  --red-light: #F5EAEA;
+  --amber: #7A6420;
+  --amber-light: #F5F0E0;
+  --blue: #2A4A6B;
+  --blue-light: #E6EEF5;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --sans: 'DM Sans', -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; }
+
+.app { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+
+.header {
+  padding: 48px 0 40px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.header h1 {
+  font-family: var(--serif);
+  font-size: 2.4rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.header-sub { font-size: 0.85rem; color: var(--text-tertiary); margin-top: 6px; font-weight: 300; }
+.header-right { text-align: right; }
+
+.timer-display {
+  font-family: var(--mono);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  transition: color 0.3s;
+}
+.timer-display.warning { color: var(--amber); }
+.timer-display.danger { color: var(--red); }
+.timer-label {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 4px;
+}
+.timer-controls { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+.timer-btn {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.timer-btn:hover { border-color: var(--text-tertiary); color: var(--text); }
+
+.section { margin-bottom: 56px; animation: fadeUp 0.4s ease both; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-light);
+}
+.section-title {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.section-badge {
+  font-size: 0.68rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow);
+}
+
+.case-content {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  font-family: var(--sans);
+  font-weight: 300;
+}
+
+.api-setup {
+  background: var(--surface-alt);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  margin-bottom: 32px;
+}
+.api-setup-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+.api-setup-sub {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  margin-bottom: 12px;
+  font-weight: 300;
+}
+.api-row { display: flex; gap: 10px; align-items: center; }
+.api-input {
+  flex: 1;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.api-input:focus { border-color: var(--accent); }
+.api-input::placeholder { color: var(--text-tertiary); }
+.api-status { font-size: 0.75rem; color: var(--text-tertiary); margin-top: 8px; font-weight: 300; }
+.api-status.connected { color: var(--accent); }
+
+.btn {
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  font-weight: 400;
+  padding: 11px 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary { background: var(--text); color: var(--bg); }
+.btn-primary:hover { background: #333; }
+.btn-primary:disabled { background: var(--border); color: var(--text-tertiary); cursor: not-allowed; }
+.btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { border-color: var(--text-tertiary); }
+.btn-accent { background: var(--accent); color: white; }
+.btn-accent:hover { background: var(--accent-hover); }
+.btn-accent:disabled { background: var(--border); color: var(--text-tertiary); cursor: not-allowed; }
+.btn-ghost { background: none; color: var(--text-secondary); padding: 8px 16px; }
+.btn-ghost:hover { color: var(--text); background: var(--surface-alt); }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.memo-group { margin-bottom: 28px; }
+.memo-label {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+  display: block;
+}
+.memo-label span { font-weight: 300; color: var(--text-tertiary); margin-left: 6px; }
+.memo-textarea {
+  width: 100%;
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  font-weight: 300;
+  line-height: 1.7;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  min-height: 80px;
+}
+.memo-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+.memo-textarea::placeholder { color: var(--text-tertiary); font-weight: 300; }
+
+.feedback-content {
+  font-size: 0.9rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  font-weight: 300;
+}
+
+.collapsible-toggle {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  font-family: var(--sans);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 12px 0;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-light);
+}
+.collapsible-toggle:hover { color: var(--text); }
+.collapsible-toggle .arrow { transition: transform 0.2s; font-size: 0.7rem; }
+.collapsible-toggle.open .arrow { transform: rotate(90deg); }
+.collapsible-body { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.collapsible-body.open { max-height: 8000px; }
+.collapsible-inner { padding: 16px 0 24px; }
+
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.phases { display: flex; gap: 4px; margin-bottom: 48px; }
+.phase { flex: 1; height: 3px; background: var(--border); border-radius: 2px; transition: background 0.3s; }
+.phase.active { background: var(--accent); }
+.phase.done { background: var(--text); }
+.phase-labels { display: flex; gap: 4px; margin-bottom: 8px; }
+.phase-label {
+  flex: 1;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  font-weight: 500;
+  transition: color 0.3s;
+}
+.phase-label.active { color: var(--accent); }
+.phase-label.done { color: var(--text); }
+
+.diff-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.diff-chip {
+  font-family: var(--sans);
+  font-size: 0.75rem;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.diff-chip:hover { border-color: var(--text-tertiary); }
+.diff-chip.selected { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+.footer {
+  padding: 48px 0 64px;
+  border-top: 1px solid var(--border-light);
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 300;
+}
+
+.notice {
+  background: var(--amber-light);
+  border: 1px solid #E0D8B8;
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: 0.82rem;
+  color: var(--amber);
+  margin-bottom: 20px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .header { padding: 32px 0 28px; flex-direction: column; align-items: flex-start; gap: 20px; }
+  .header-right { text-align: left; }
+  .header h1 { font-size: 1.8rem; }
+  .card { padding: 24px; }
+  .api-row { flex-direction: column; }
+  .btn-row { flex-direction: column; }
+  .btn { width: 100%; justify-content: center; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <div>
+      <h1>Deal Memo Gym</h1>
+      <p class="header-sub">VCIC Competition Simulator</p>
+    </div>
+    <div class="header-right">
+      <p class="timer-label">Time Remaining</p>
+      <div id="timer" class="timer-display">08:00</div>
+      <div class="timer-controls">
+        <button class="timer-btn" onclick="startTimer()">Start</button>
+        <button class="timer-btn" onclick="pauseTimer()">Pause</button>
+        <button class="timer-btn" onclick="resetTimer()">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="phase-labels">
+    <div id="pl1" class="phase-label active">1. Case</div>
+    <div id="pl2" class="phase-label">2. Draft</div>
+    <div id="pl3" class="phase-label">3. Score</div>
+    <div id="pl4" class="phase-label">4. Review</div>
+  </div>
+  <div class="phases">
+    <div id="p1" class="phase active"></div>
+    <div id="p2" class="phase"></div>
+    <div id="p3" class="phase"></div>
+    <div id="p4" class="phase"></div>
+  </div>
+
+  <!-- Generate Section -->
+  <section class="section" id="generateSection">
+    <div class="section-header">
+      <h2 class="section-title">New Rep</h2>
+      <span class="section-badge" id="repCounter">Rep #1</span>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <p style="font-size:0.8rem;color:var(--text-tertiary);margin-bottom:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;">Stage</p>
+      <div class="diff-row">
+        <button class="diff-chip selected" data-stage="Seed" onclick="selectStage(this)">Seed</button>
+        <button class="diff-chip" data-stage="Series A" onclick="selectStage(this)">Series A</button>
+      </div>
+    </div>
+    <div style="margin-bottom: 24px;">
+      <p style="font-size:0.8rem;color:var(--text-tertiary);margin-bottom:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;">Sector</p>
+      <div class="diff-row">
+        <button class="diff-chip selected" data-sector="Random" onclick="selectSector(this)">Random</button>
+        <button class="diff-chip" data-sector="SaaS" onclick="selectSector(this)">SaaS</button>
+        <button class="diff-chip" data-sector="Marketplace" onclick="selectSector(this)">Marketplace</button>
+        <button class="diff-chip" data-sector="Fintech" onclick="selectSector(this)">Fintech</button>
+        <button class="diff-chip" data-sector="Consumer" onclick="selectSector(this)">Consumer</button>
+        <button class="diff-chip" data-sector="Deeptech" onclick="selectSector(this)">Deeptech</button>
+      </div>
+    </div>
+
+    <button class="btn btn-accent" id="generateBtn" onclick="generateCase()">Generate Case Packet</button>
+  </section>
+
+  <!-- Case Packet -->
+  <section class="section" id="caseSection" style="display:none;">
+    <div class="section-header">
+      <h2 class="section-title">Mini Case Packet</h2>
+      <span class="section-badge">60-120 sec read</span>
+    </div>
+    <div class="card">
+      <div id="caseContent" class="case-content"></div>
+    </div>
+    <div style="margin-top:20px;">
+      <button class="btn btn-primary" onclick="showMemo()">Start Memo (begins timer)</button>
+    </div>
+  </section>
+
+  <!-- Memo -->
+  <section class="section" id="memoSection" style="display:none;">
+    <div class="section-header">
+      <h2 class="section-title">Your Investment Memo</h2>
+      <span class="section-badge">8 min target</span>
+    </div>
+    <div class="card">
+      <div class="memo-group">
+        <label class="memo-label">A. Recommendation <span>Invest / Pass / Needs More Data</span></label>
+        <textarea class="memo-textarea" id="memoA" rows="2" placeholder="One-line recommendation with conviction..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">B. Investment Thesis <span>3 bullets</span></label>
+        <textarea class="memo-textarea" id="memoB" rows="4" placeholder="Three core reasons to back this company..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">C. Market & Timing</label>
+        <textarea class="memo-textarea" id="memoC" rows="3" placeholder="TAM/SAM/SOM, why now, market dynamics..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">D. Product & Defensibility</label>
+        <textarea class="memo-textarea" id="memoD" rows="3" placeholder="Moat, switching costs, network effects..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">E. Traction & Unit Economics</label>
+        <textarea class="memo-textarea" id="memoE" rows="3" placeholder="Revenue, growth, CAC/LTV, margins..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">F. Team Assessment</label>
+        <textarea class="memo-textarea" id="memoF" rows="3" placeholder="Founder-market fit, gaps, red flags..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">G. Key Risks <span>Ranked + kill criteria</span></label>
+        <textarea class="memo-textarea" id="memoG" rows="5" placeholder="Ranked risks, mitigation, what kills the deal..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">H. Valuation & Ownership</label>
+        <textarea class="memo-textarea" id="memoH" rows="3" placeholder="Pre/post, ownership %, fund math..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">I. Deal Terms Stance</label>
+        <textarea class="memo-textarea" id="memoI" rows="3" placeholder="Liquidation pref, pro-rata, board seat..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">J. What Must Be True / What Could Go Wrong <span>3 each</span></label>
+        <textarea class="memo-textarea" id="memoJ" rows="4" placeholder="Three conditions for success, three failure modes..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">K. Diligence Questions <span>10, prioritized</span></label>
+        <textarea class="memo-textarea" id="memoK" rows="6" placeholder="Ranked by impact on investment decision..."></textarea>
+      </div>
+      <div class="memo-group">
+        <label class="memo-label">L. IC / Judge Q&A Prep</label>
+        <textarea class="memo-textarea" id="memoL" rows="4" placeholder="Anticipated tough questions and your answers..."></textarea>
+      </div>
+      <div class="btn-row" style="margin-top:8px;">
+        <button class="btn btn-accent" id="submitBtn" onclick="submitMemo()">Submit for Scoring</button>
+        <button class="btn btn-ghost" onclick="clearMemo()">Clear All</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feedback -->
+  <section class="section" id="feedbackSection" style="display:none;">
+    <div class="section-header">
+      <h2 class="section-title">Score & Feedback</h2>
+      <span class="section-badge" id="feedbackBadge">Complete</span>
+    </div>
+    <div class="card" id="scoringCard">
+      <div id="feedbackContent" class="feedback-content"></div>
+    </div>
+    <div id="goldSection" style="display:none;margin-top:16px;">
+      <button class="collapsible-toggle" onclick="toggleCollapsible(this)">Gold Standard Memo<span class="arrow">&#9654;</span></button>
+      <div class="collapsible-body"><div class="collapsible-inner"><div id="goldContent" class="feedback-content"></div></div></div>
+    </div>
+    <div id="redTeamSection" style="display:none;margin-top:4px;">
+      <button class="collapsible-toggle" onclick="toggleCollapsible(this)">Red Team Judge Q&A<span class="arrow">&#9654;</span></button>
+      <div class="collapsible-body"><div class="collapsible-inner"><div id="redTeamContent" class="feedback-content"></div></div></div>
+    </div>
+    <div id="drillsSection" style="display:none;margin-top:4px;">
+      <button class="collapsible-toggle" onclick="toggleCollapsible(this)">Micro-Drills<span class="arrow">&#9654;</span></button>
+      <div class="collapsible-body"><div class="collapsible-inner"><div id="drillsContent" class="feedback-content"></div></div></div>
+    </div>
+    <div class="btn-row" style="margin-top:32px;">
+      <button class="btn btn-primary" onclick="newRep()">New Rep</button>
+    </div>
+  </section>
+
+  <!-- API Setup (optional, at bottom) -->
+  <section class="section" id="apiSection">
+    <div class="collapsible-toggle" onclick="toggleCollapsible(this)" style="border-top:none;border-bottom:1px solid var(--border-light);">
+      Optional: AI-Powered Scoring (Anthropic API)<span class="arrow">&#9654;</span>
+    </div>
+    <div class="collapsible-body">
+      <div class="collapsible-inner">
+        <div class="api-setup">
+          <div class="api-setup-title">Anthropic API Key</div>
+          <div class="api-setup-sub">Enables AI scoring of your memos. Without it, cases still work and you can self-score.</div>
+          <div class="api-row">
+            <input type="password" class="api-input" id="apiKey" placeholder="sk-ant-..." autocomplete="off">
+            <button class="btn btn-secondary" onclick="saveApiKey()">Save</button>
+          </div>
+          <p class="api-status" id="apiStatus">Key stored locally in browser only.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">VCIC Deal Memo Gym &middot; All cases are fictional &middot; 12 built-in cases + optional AI scoring</footer>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// EMBEDDED CASE BANK (12 cases)
+// ══════════════════════════════════════════
+const CASES = [
+{
+stage:"Seed",sector:"SaaS",
+text:`COMPANY SNAPSHOT
+- Name: Canopy Analytics
+- Sector: B2B SaaS (Climate Compliance)
+- Product: Automated carbon accounting and ESG reporting platform for mid-market manufacturers (200-2,000 employees)
+- ICP: VP of Sustainability or CFO at mid-market manufacturers facing new SEC climate disclosure mandates
+- Business Model: Annual SaaS subscription, tiered by facility count. Average ACV $42K.
+
+MARKET
+- TAM: $18B global carbon accounting and ESG software market (Grand View Research, 2025)
+- SAM: $4.2B mid-market manufacturing segment in North America and EU
+- SOM: $120M (targeting 2,800 mid-market manufacturers in 6 heavy-emission verticals)
+- Growth Rate: 22% CAGR through 2030
+- Why Now: SEC climate disclosure rules finalized in 2024. EU CSRD compliance deadlines hitting 2025-2026. Mid-market companies lack tooling, relying on consultants and spreadsheets.
+
+TRACTION
+- $380K ARR (up from $40K 9 months ago, roughly 9.5x growth)
+- 9 paying customers, 23 in active pipeline
+- Logo retention: 100% (no churn yet, but only 9 months of data)
+- NRR: 115% from upselling additional facilities
+- Sales cycle: 45-60 days
+- Pipeline signal: 3 inbound leads per week from SEC-related Google searches
+
+UNIT ECONOMICS
+- CAC: $18,000 (blended: $8K content/SEO, $28K outbound sales)
+- LTV: $126,000 (assuming 3-year life, which is unproven)
+- LTV/CAC: 7.0x
+- Payback Period: 5.1 months
+- Gross Margin: 78%
+- Burn Rate: $165K/month
+- Runway: 7 months at current burn
+
+COMPETITION
+1. Persefoni - Well-funded ($100M+), targets enterprise. Overkill and overpriced for mid-market.
+2. Watershed - Strong brand, but horizontal across all industries. No manufacturing-specific data integrations.
+3. Manual consultants - $200K+ annual engagements, slow, not software-scalable.
+- Differentiation: Canopy has pre-built integrations with 12 manufacturing ERP systems (SAP, Oracle, Epicor) and auto-maps Scope 1/2/3 emissions from production data. Competitors require months of custom setup.
+
+TEAM
+- CEO: Maria Chen, ex-Head of Product at Enablon (EHS software, acquired by Wolters Kluwer for $300M). 8 years in environmental compliance software.
+- CTO: James Okafor, ex-senior engineer at Palantir, built data pipeline infrastructure. Strong technical background but no prior startup experience.
+- Head of Sales: Recently hired from Salesforce mid-market team. Joined 6 weeks ago.
+- Red Flag: CTO has never worked at a company with fewer than 500 employees. Two early engineers were hired from his Palantir network and both hold advisor equity, creating potential loyalty conflicts.
+
+CAP TABLE & FINANCING
+- Founders: 70% (Maria 45%, James 25%)
+- Pre-seed investors (angels): 12% via SAFEs at $6M cap
+- Advisor pool: 3%
+- Employee option pool: 10% (partially allocated)
+- Remaining SAFE: 5% from a climate-focused angel syndicate at $8M cap
+- Note: The two SAFEs at different caps will create cap table complexity at conversion.
+
+ROUND DETAILS
+- Raising: $3.5M Seed
+- Pre-money Valuation: $14M
+- Post-money Valuation: $17.5M
+- Investor ownership target: 20%
+- Use of Proceeds: 50% engineering (Scope 3 module, API marketplace), 30% sales (3 AEs), 20% ops and compliance certifications (SOC 2)
+
+DATA ROOM EXCERPTS
+- Customer interviews show 7 of 9 customers purchased because of "panic" about SEC deadlines, not long-term strategic commitment. Risk: demand may be regulatory-cycle dependent.
+- Gross margin has dropped from 84% to 78% over the last two quarters as onboarding costs scaled. Custom ERP integrations require more engineering hours than projected.
+- Founder vesting: Maria's shares are on a standard 4-year vest, but James negotiated a 3-year vest with only a 6-month cliff. 18 months of his vest have already passed.
+- The $8M cap SAFE investor has a side letter granting pro-rata rights and an MFN clause that could ratchet down to the $6M cap.
+- Pipeline analysis shows 80% of the 23 pipeline deals are in the same 2 verticals (chemicals and metals). Concentration risk is high.
+
+MESSY DATA POINT
+The company reports $380K ARR, but the data room shows $310K in recognized annual recurring revenue and $70K from a 14-month contract with a chemical company that includes a one-time $25K implementation fee baked into the "annual" figure. Actual clean ARR may be closer to $330K.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Series A",sector:"Fintech",
+text:`COMPANY SNAPSHOT
+- Name: Ledgr
+- Sector: Fintech / Embedded Finance
+- Product: API-first treasury management platform for SaaS companies that automates cash positioning, yield optimization, and multi-bank reconciliation
+- ICP: CFO or VP Finance at SaaS companies with $5M-$100M ARR and 2+ bank accounts
+- Business Model: Platform fee (0.05% of assets under management on platform) + per-transaction fee ($0.50 per reconciliation event). Hybrid revenue.
+
+MARKET
+- TAM: $12B global treasury management software market
+- SAM: $2.8B segment targeting mid-market SaaS companies in the US
+- SOM: $85M (estimated 3,400 SaaS companies in their sweet spot)
+- Growth Rate: 18% CAGR
+- Why Now: SVB collapse created urgency around multi-bank treasury strategy. SaaS companies now hold cash across 3-5 banks on average (up from 1.2). Manual reconciliation is breaking finance teams.
+
+TRACTION
+- $2.1M ARR
+- 47 paying customers
+- Net Revenue Retention: 138% (driven by AUM growth as customers scale)
+- Gross Churn: 8% annually
+- Growth: 15% MoM for last 6 months (tripled ARR in a year)
+- Sales cycle: 30-40 days
+- Pipeline: $4.2M in qualified pipeline, 40% from inbound referrals
+
+UNIT ECONOMICS
+- CAC: $22,000 (blended)
+- LTV: $198,000 (based on current retention and expansion)
+- LTV/CAC: 9.0x
+- Payback Period: 5.6 months
+- Gross Margin: 72% (lower than pure SaaS due to banking API costs and compliance overhead)
+- Burn Rate: $340K/month
+- Runway: 10 months
+
+COMPETITION
+1. Kyriba - Enterprise legacy TMS. $500K+ ACVs, 6-month implementation. No SaaS-native API product.
+2. Trovata - Closest competitor. Open banking approach. $15M Series B. Less vertical focus on SaaS.
+3. Mercury Treasury - New offering from Mercury Bank. Free but limited to Mercury customers. Potential disruptor.
+- Differentiation: Ledgr is the only platform with pre-built integrations to all 8 major SaaS billing systems (Stripe, Chargebee, Recurly, etc.) enabling automatic cash-flow forecasting tied to subscription revenue.
+
+TEAM
+- CEO: David Park, ex-VP of Finance at Brex. Managed $2B+ in corporate cash. Deep fintech network.
+- CTO: Nadia Volkov, ex-Plaid engineer (employee #38). Built bank connectivity infrastructure.
+- COO: Alex Reyes, ex-McKinsey (3 years), then ops lead at Ramp. Joined 4 months ago.
+- Red Flag: CEO David was at Brex during its high-profile layoffs in 2022 and led the cost-cutting. Multiple Glassdoor reviews from that period mention his management style negatively. Two early Ledgr employees departed in month 8.
+
+CAP TABLE & FINANCING
+- Founders: 58% (David 35%, Nadia 23%)
+- Seed investors: 22% ($2.5M seed at $9M post-money, led by Craft Ventures)
+- Employee option pool: 15% (8% allocated, 7% remaining)
+- Advisor shares: 3%
+- Small SAFE: 2% from a fintech angel at $15M cap, unconverted
+
+ROUND DETAILS
+- Raising: $10M Series A
+- Pre-money Valuation: $45M
+- Post-money Valuation: $55M
+- Lead investor ownership: 18.2%
+- Use of Proceeds: 40% engineering (SOC 2 Type II, international banking APIs), 35% GTM (build outbound motion, 5 AEs), 15% compliance/legal, 10% ops
+
+DATA ROOM EXCERPTS
+- Bank partner agreement with Column Financial has a 12-month exclusivity clause on yield product that expires in 5 months. No renewal guarantee. If Column pulls out, the yield optimization feature (32% of value prop in customer surveys) is at risk.
+- Customer concentration: Top 3 customers represent 28% of ARR. Two are in the crypto/web3 space. Sector risk.
+- Compliance review flagged that Ledgr's yield optimization product may require money transmitter licenses in 6 states where they currently operate without them. Estimated cost: $400K+ and 8-12 months.
+- Employee survey (anonymous) shows CTO rates 4.8/5 but CEO rates 2.9/5 on leadership trust. Morale gap between engineering and business teams.
+- 15% MoM growth has been partially fueled by a one-time partnership with a SaaS accelerator that contributed 11 of the last 20 customers. That pipeline is now depleted.
+
+MESSY DATA POINT
+The company reports 138% NRR, but this is calculated on a trailing 6-month basis only. When calculated on a full 12-month cohort basis (which is standard), NRR drops to 118% because early cohorts from pre-product-market-fit had higher churn. The 138% figure is technically accurate but misleading for a Series A evaluation.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Seed",sector:"Marketplace",
+text:`COMPANY SNAPSHOT
+- Name: BuildBridge
+- Sector: B2B Marketplace
+- Product: Two-sided marketplace connecting commercial general contractors with specialty subcontractors (electrical, plumbing, HVAC, concrete) for mid-size projects ($500K-$10M)
+- ICP: General contractors managing 5-20 active projects who need reliable subs on short notice
+- Business Model: 4.5% take rate on contracted project value, charged to the GC. Subs listed free.
+
+MARKET
+- TAM: $420B US commercial subcontracting market
+- SAM: $85B mid-size commercial segment (projects $500K-$10M)
+- SOM: $1.7B (targeting 4 metro areas in the Southeast US initially)
+- Growth Rate: 7% CAGR (construction market), but fragmentation is increasing (30% of subs are now independent vs 22% five years ago)
+- Why Now: Labor shortage in skilled trades is at crisis levels. 650,000 unfilled construction jobs. GCs are spending 25+ hours/week sourcing and vetting subs. No dominant digital platform exists.
+
+TRACTION
+- GMV: $6.8M lifetime ($3.1M in last quarter alone, up from $1.4M prior quarter)
+- Revenue: $306K total ($140K last quarter)
+- Active GCs: 42 (up from 18 three months ago)
+- Active subs on platform: 380
+- Repeat booking rate: 61% (GCs rebooking subs they found on platform)
+- Average project size matched: $620K
+- Liquidity metric: 78% of sub requests receive 3+ bids within 48 hours
+
+UNIT ECONOMICS
+- CAC for GCs: $3,200 (in-person sales + conference presence)
+- CAC for Subs: $85 (referral + SEO)
+- LTV per GC: $28,000 (based on avg 2.8 projects/year at $620K, 4.5% take rate, assumed 3-year life)
+- LTV/CAC: 8.75x
+- Gross Margin: 68% (lower due to vetting/insurance verification costs)
+- Burn Rate: $120K/month
+- Runway: 9 months
+
+COMPETITION
+1. BuildingConnected (Autodesk) - Focus on bid management, not matching. Enterprise-heavy, not real-time.
+2. Thumbtack/Angi - Residential only. No commercial licensing, insurance, or bonding verification.
+3. Word of mouth - The dominant "competitor." 85%+ of sub relationships formed through personal networks.
+- Differentiation: BuildBridge auto-verifies licenses, insurance, bonding, and OSHA records. Provides real-time sub availability calendars synced with project management tools. Competitors have none of this.
+
+TEAM
+- CEO: Marcus Williams, 12 years as a commercial GC. Ran a $40M/year contracting firm. Sold it in 2023. Deep domain credibility.
+- CTO: Priya Desai, ex-DoorDash engineer on marketplace matching algorithms. 5 years building two-sided marketplaces.
+- Head of Sub Relations: Tony Russo, 20 years in trade unions. Built initial supply side through personal relationships.
+- Red Flag: CEO Marcus has no prior tech company experience. He ran the product roadmap directly for the first year and several features were over-engineered for edge cases. CTO Priya joined only 5 months ago and has been rebuilding parts of the original codebase.
+
+CAP TABLE & FINANCING
+- Founders: 75% (Marcus 50%, Priya 15% - with standard 4-year vest, Tony 10% - fully vested advisor shares)
+- Pre-seed angel investors: 15% via SAFEs at $5M cap
+- Option pool: 10% (3% allocated)
+- Note: Tony Russo's 10% is fully vested with no clawback, despite being a part-time advisor. He attends weekly calls but works another job full-time.
+
+ROUND DETAILS
+- Raising: $2.5M Seed
+- Pre-money Valuation: $10M
+- Post-money Valuation: $12.5M
+- Investor ownership target: 20%
+- Use of Proceeds: 45% engineering (mobile app for subs, matching algorithm v2), 30% geographic expansion (2 new metros), 25% GC sales team (2 reps)
+
+DATA ROOM EXCERPTS
+- Three of the top 5 GCs by GMV are personal contacts of CEO Marcus from his contracting days. It is unclear if demand is organic or relationship-driven.
+- Insurance verification system had a false positive rate of 12% in Q4 (flagging valid subs as uninsured). This caused 8 subs to leave the platform.
+- Financial model assumes take rate increases to 6% by Year 3. No evidence this is feasible. GCs have already pushed back on the current 4.5% rate.
+- Priya's employment agreement has an unusual clause: if she is terminated without cause in the first 2 years, her unvested shares accelerate 50%.
+- Project dispute rate is 14% (industry average is ~18%), but disputes are resolved manually by Marcus personally. No scalable resolution process exists.
+
+MESSY DATA POINT
+The 61% repeat booking rate is tracked by "GC accounts," but 3 of the 42 GC accounts are actually 3 different branches of the same regional contractor (Southeast Mechanical Group). If consolidated, the effective unique GC count is 40, and the repeat rate drops to 55%. The pipeline also includes 6 "active" GCs who registered but have not yet posted a single project.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Series A",sector:"Consumer",
+text:`COMPANY SNAPSHOT
+- Name: Palate
+- Sector: Consumer / Food & Beverage
+- Product: AI-powered personalized meal kit subscription that adapts weekly menus to individual taste preferences, dietary needs, and ingredient availability using a proprietary flavor-pairing algorithm
+- ICP: Health-conscious professionals aged 28-45, household income $80K+, in urban metros
+- Business Model: Weekly subscription ($79/week for 4 meals for 2 people). Average order value: $79. Monthly ARPU: $316.
+
+MARKET
+- TAM: $28B US meal kit and prepared food delivery market
+- SAM: $9B premium/personalized segment
+- SOM: $270M (targeting 6 major metros on the East Coast)
+- Growth Rate: 12% CAGR for premium meal kits (mass market is flat)
+- Why Now: Post-COVID cooking fatigue has set in. Consumers want convenience but are moving away from generic meal kits (HelloFresh churn is 70%+ annually). AI personalization is the key to retention.
+
+TRACTION
+- Revenue: $8.2M ARR (annualized from last month's $685K revenue)
+- Active subscribers: 2,180 weekly subscribers
+- Growth: 12% MoM subscriber growth over last 6 months
+- Monthly Churn: 6.2% (74% annualized) -- industry average is ~70%
+- Reactivation rate: 18% of churned users resubscribe within 90 days
+- NPS: 72 (well above industry average of 38)
+- Waitlist: 4,200 in 3 markets where they haven't launched
+
+UNIT ECONOMICS
+- CAC: $145 (paid social + influencer partnerships)
+- LTV: $820 (based on average subscriber life of 4.3 months at $316 ARPU, 42% contribution margin)
+- LTV/CAC: 5.7x
+- Contribution Margin: 42% per box (after COGS, packaging, shipping)
+- Gross Margin: 38% (including fulfillment center overhead)
+- Burn Rate: $520K/month
+- Runway: 5 months (urgent raise)
+
+COMPETITION
+1. HelloFresh - Market leader but generic. No personalization. Massive churn problem. Stock down 80% from peak.
+2. Factor (HelloFresh subsidiary) - Prepared meals, not cooking kits. Different value prop.
+3. Hungryroot - AI-powered grocery, closest competitor. $100M+ revenue but focused on grocery, not meal kits.
+- Differentiation: Palate's "TasteGraph" algorithm learns from user ratings, cooking time preferences, and leftover patterns. After 4 weeks, menu accuracy hits 89% approval vs. 54% for manually chosen kits. This drives the NPS and reactivation edge.
+
+TEAM
+- CEO: Sarah Kim, ex-VP of Product at Blue Apron during its growth phase (2015-2018). Left before IPO. Deep operational knowledge of meal kit logistics.
+- CTO: Ryan Chen, ex-Google Research (ML team). Built recommendation systems for YouTube. PhD in ML from Stanford.
+- VP Operations: Maria Santos, ex-operations director at Amazon Fresh. Manages 2 fulfillment centers.
+- Red Flag: CEO Sarah was part of the Blue Apron leadership during the period that led to the disastrous IPO and 90% stock decline. Her LinkedIn frames this as "scaling to $800M revenue" without mentioning the unit economics collapse. VP Ops Maria has been in role only 3 months.
+
+CAP TABLE & FINANCING
+- Founders: 52% (Sarah 30%, Ryan 22%)
+- Seed investors: 28% ($4M seed at $10M post from Forerunner Ventures and food-tech angels)
+- Employee option pool: 15% (9% allocated)
+- Advisor shares: 5% (includes a celebrity chef advisor with 2.5%)
+
+ROUND DETAILS
+- Raising: $12M Series A
+- Pre-money Valuation: $50M
+- Post-money Valuation: $62M
+- Lead investor ownership: 19.4%
+- Use of Proceeds: 35% geographic expansion (3 new metros + West Coast fulfillment center), 30% marketing (brand campaign + influencer scaling), 20% engineering (TasteGraph v2), 15% ops (cold chain improvements)
+
+DATA ROOM EXCERPTS
+- 74% annualized churn is actually slightly WORSE than the industry average when measured on a per-cohort basis. Early cohorts (pre-TasteGraph v2) churn at 82%. Recent cohorts churn at 58%. Blended number masks improvement.
+- Fulfillment center lease in New Jersey expires in 8 months. Landlord has indicated a 40% rent increase. No backup location secured.
+- Top 3 influencer partnerships drive 45% of new subscriber acquisition. All 3 contracts expire in Q2 2026. One influencer has publicly explored launching her own meal kit brand.
+- Food waste rate is 22% of purchased ingredients. Industry best practice is 12-15%. This is a direct hit to gross margin improvement.
+- TasteGraph algorithm requires 4 weeks of data per user. During those first 4 weeks, churn rate is 3x higher than post-personalization churn. This creates a "cold start" problem for every new subscriber.
+
+MESSY DATA POINT
+The $8.2M ARR is annualized from the most recent month, which included a 20%-off Black Friday promotion that boosted subscriber additions by 40%. Normalizing for promo-driven growth, run rate ARR is closer to $7.1M. Additionally, 8% of "active" subscribers are on paused plans (counted as active but not generating current revenue).
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Seed",sector:"Deeptech",
+text:`COMPANY SNAPSHOT
+- Name: Ferromine
+- Sector: Deeptech / Materials Science
+- Product: Proprietary bio-leaching process that extracts rare earth elements (REEs) from mining waste (tailings) at 60% lower cost and 90% lower carbon emissions than traditional acid-based extraction
+- ICP: Mining companies sitting on tailings ponds, battery manufacturers needing domestic REE supply, and US/EU government agencies funding critical mineral supply chains
+- Business Model: Licensing + revenue share. License the bio-leaching process to mining operators, collect 8-12% royalty on extracted REE value. Long-term: operate owned processing facilities.
+
+MARKET
+- TAM: $15B global rare earth element market (neodymium, dysprosium, praseodymium focus)
+- SAM: $4.5B North American + EU REE demand (currently 85% supplied by China)
+- SOM: $320M (targeting REE recovery from 15 major tailings sites in the US and Canada)
+- Growth Rate: 28% CAGR driven by EV battery demand, wind turbines, and defense applications
+- Why Now: US CHIPS Act and Inflation Reduction Act include $3.7B in critical mineral incentives. DOE and DOD are actively funding domestic REE supply alternatives. China's export restrictions on REEs tightened again in late 2024.
+
+TRACTION
+- Revenue: $0 (pre-revenue, technology stage)
+- Completed 3 successful pilot extractions at bench scale (10kg batches)
+- LOI signed with Freeport-McMoRan for a pilot at their Morenci copper mine tailings (worth $1.2M if converted to contract)
+- DOE ARPA-E Phase 1 grant: $500K awarded (validation of scientific merit)
+- 2 provisional patents filed covering bio-leaching organism strain and processing methodology
+- Advisory board includes a former USGS Director and the head of MIT Materials Lab
+
+UNIT ECONOMICS
+- At scale projections (post-pilot, 18+ months out):
+  - Cost per kg of extracted neodymium: $38 (vs. industry average $95)
+  - Projected gross margin: 65-72% at commercial scale
+  - Revenue per processing facility: $8-12M/year
+- Current state:
+  - Burn Rate: $95K/month (lean team, mostly lab costs)
+  - Runway: 11 months
+  - No revenue, no unit economics proven at scale
+
+COMPETITION
+1. MP Materials - Only US rare earth mine (Mountain Pass, CA). Conventional mining, not tailings recovery. Public company, $2B+ market cap.
+2. USA Rare Earth - Developing a Round Top deposit in Texas. 5+ years from production.
+3. REEtec (Norway) - Novel separation tech but focused on European market and different feedstock.
+- Differentiation: Ferromine doesn't mine. It recovers REEs from waste that already exists, eliminating permitting timelines (2-3 years for new mines) and most environmental opposition. Bio-leaching uses engineered bacteria instead of sulfuric acid.
+
+TEAM
+- CEO: Dr. Elena Vasquez, PhD in Geomicrobiology from MIT. 6 years of REE research. Published 14 peer-reviewed papers. First-time founder.
+- CTO: Dr. Raj Patel, PhD in Chemical Engineering from Georgia Tech. 4 years at Albemarle (lithium processing). Understands industrial scale-up.
+- VP of Business Development: Tom Bradley, 15 years in mining industry, ex-Rio Tinto. Deep rolodex with mining majors.
+- Red Flag: Both co-founders are PhDs with no prior startup operating experience. Dr. Vasquez has never managed more than 3 lab technicians. The business development hire is strong, but he joined only 8 weeks ago and has no equity vested.
+
+CAP TABLE & FINANCING
+- Founders: 80% (Elena 50%, Raj 30%)
+- ARPA-E grant: non-dilutive (no equity impact)
+- Pre-seed angel investors: 8% via SAFE at $4M cap
+- Advisors: 4%
+- Option pool: 8% (1% allocated to Tom Bradley, 4-year vest)
+
+ROUND DETAILS
+- Raising: $3M Seed
+- Pre-money Valuation: $12M
+- Post-money Valuation: $15M
+- Investor ownership target: 20%
+- Use of Proceeds: 60% pilot scale-up (move from 10kg to 500kg batch processing), 25% team (hire process engineer + ops manager), 15% patent prosecution + IP protection
+
+DATA ROOM EXCERPTS
+- Bench-scale results show 73% REE recovery rate, but this was achieved with a specific tailings composition (high-copper mine waste). Recovery rates from other tailings types are untested and may vary significantly.
+- Bio-leaching organisms are temperature-sensitive. Lab environment maintains 25-28C. Outdoor processing at Morenci (Arizona desert) will face 45C+ summers. No data on organism viability at extreme temperatures.
+- The Freeport-McMoRan LOI is non-binding and was signed by a regional VP, not corporate leadership. Internal sources suggest corporate is evaluating 3 competing tailings recovery technologies.
+- Patent counsel noted that one of the two provisional patents has "significant prior art overlap" with a 2019 Chinese patent. Freedom-to-operate analysis is incomplete.
+- DOE ARPA-E Phase 2 ($2.5M) decision expected in 4 months. If denied, the company's financial plan has a 6-month gap before revenue.
+
+MESSY DATA POINT
+The $38/kg projected cost assumes processing at a facility that does not yet exist, using organism strains that have only been tested at bench scale. The cost model also assumes electricity at $0.04/kWh (industrial rate in Arizona), but the Morenci pilot site's actual rate is $0.07/kWh. At the real electricity rate, projected cost rises to $52/kg -- still competitive but with much thinner margins.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Series A",sector:"SaaS",
+text:`COMPANY SNAPSHOT
+- Name: DocketAI
+- Sector: B2B SaaS (Legal Tech)
+- Product: AI-powered contract review and clause negotiation platform for in-house legal teams at mid-market and enterprise companies
+- ICP: General Counsel or Head of Legal at companies with 500-5,000 employees processing 200+ contracts/month
+- Business Model: Annual SaaS subscription tiered by contract volume. Average ACV: $68K. Enterprise tier: $120K+.
+
+MARKET
+- TAM: $25B global legal tech market
+- SAM: $6.2B contract lifecycle management (CLM) segment
+- SOM: $350M (targeting 5,100 mid-market companies with in-house legal teams in the US)
+- Growth Rate: 20% CAGR. AI-specific legal tools growing at 35%+ CAGR
+- Why Now: GPT-4 class models have made clause-level contract analysis viable for the first time. Legal departments are under pressure to do more with flat budgets. Average in-house legal team size has not grown in 3 years despite 40% increase in contract volume.
+
+TRACTION
+- $3.8M ARR
+- 56 paying customers
+- NRR: 125%
+- Logo retention: 91% annually
+- Growth: 110% YoY ARR growth
+- Sales cycle: 60-90 days (legal teams are slow buyers)
+- Pipeline: $6.5M in qualified pipeline
+- Key logos: 3 Fortune 1000 companies, 2 large law firms using it for their corporate clients
+
+UNIT ECONOMICS
+- CAC: $42,000 (heavy demo/POC motion, 30-day free trials)
+- LTV: $272,000 (based on 91% retention, 125% NRR, 4-year average life)
+- LTV/CAC: 6.5x
+- Payback Period: 7.4 months
+- Gross Margin: 81%
+- Burn Rate: $410K/month
+- Runway: 8 months
+
+COMPETITION
+1. Ironclad - Market leader in CLM. $150M+ raised. Strong workflow but AI features are bolt-on, not native.
+2. Luminance - UK-based AI contract review. Strong in EU market. Less US traction.
+3. SpotDraft - Contract automation for fast-growing companies. Lighter-weight, lower ACV segment.
+- Differentiation: DocketAI's proprietary "ClauseEngine" was trained on 2.1M real negotiated contracts (licensed from a legal data provider). It doesn't just flag risks -- it suggests counter-language with confidence scores based on how often similar clauses were accepted in comparable deals. No competitor has this negotiation layer.
+
+TEAM
+- CEO: Lisa Huang, former associate at Kirkland & Ellis (3 years) then Head of Legal Ops at Stripe. Built Stripe's internal contract automation tools.
+- CTO: Marcus Thompson, ex-OpenAI applied research team (2 years). Previously at Google NLP. ML expertise is top-tier.
+- VP Sales: Jennifer Walsh, 8 years at Salesforce selling to legal and compliance buyers. Joined 7 months ago. Already closed 18 of the 56 customers.
+- Red Flag: The 2.1M contract training dataset is licensed from a legal data provider under a 3-year exclusive agreement. 18 months remain. If the provider raises prices or licenses to competitors, the moat degrades significantly. Also, Marcus (CTO) still has 6 months on a non-compete from OpenAI -- legal counsel says it's likely unenforceable but it's technically active.
+
+CAP TABLE & FINANCING
+- Founders: 55% (Lisa 32%, Marcus 23%)
+- Seed investors: 25% ($3.5M seed at $10.5M post from Bessemer Venture Partners)
+- Employee option pool: 15% (10% allocated, 5% remaining)
+- Advisors: 5% (includes ex-GC of Microsoft, highly strategic)
+
+ROUND DETAILS
+- Raising: $15M Series A
+- Pre-money Valuation: $60M (15.8x ARR multiple)
+- Post-money Valuation: $75M
+- Lead investor ownership: 20%
+- Use of Proceeds: 35% engineering (ClauseEngine v3, multi-language support), 35% GTM (scale sales team from 4 to 12 AEs, launch partner channel), 20% customer success (reduce time-to-value), 10% legal/compliance (SOC 2 Type II, GDPR)
+
+DATA ROOM EXCERPTS
+- Of the 56 customers, 38 are on annual contracts and 18 are on month-to-month plans. The month-to-month customers churn at 22% annually vs. 4% for annual contracts. Blended 91% logo retention masks this disparity.
+- ClauseEngine training data contains contracts from 2016-2023. Post-2023 regulatory changes (EU AI Act, updated CCPA) are not reflected. 12% of clause suggestions reference outdated compliance language per an internal audit.
+- The 3 Fortune 1000 customers were landed at 60-70% discounts as "design partners." Combined, they represent $180K in ARR at an average ACV of $60K -- well below the $120K enterprise tier list price.
+- The company has received a cease-and-desist letter from a patent troll claiming infringement on a broad AI contract analysis patent. Legal counsel estimates a 15% chance of meaningful liability but the distraction cost could be significant.
+- VP Sales Jennifer is performing exceptionally, but she has a unique compensation package: 2x the standard commission rate for the first 18 months, plus a $200K signing bonus that vests over 1 year. Fully loaded, her comp is $580K.
+
+MESSY DATA POINT
+The 110% YoY ARR growth figure is calculated from January to January. But in January of last year, the company had only just launched and had $1.8M ARR, much of which was locked in during a heavily discounted launch promotion. If growth is measured from Q2 to Q2 (post-launch normalization), YoY growth is 78% -- still strong but materially different from the headline number.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Seed",sector:"Consumer",
+text:`COMPANY SNAPSHOT
+- Name: Driftwell
+- Sector: Consumer Health / Wellness
+- Product: Smart hydration system combining a connected water bottle with a subscription for personalized electrolyte pods, adapted daily based on activity data from wearables (Apple Watch, Whoop, Garmin)
+- ICP: Fitness enthusiasts aged 25-40, active 4+ days/week, who already own a wearable device
+- Business Model: Hardware + subscription hybrid. Bottle: $89 one-time purchase. Electrolyte pod subscription: $29/month (30 pods). Gross margin split: 25% on hardware, 72% on pods.
+
+MARKET
+- TAM: $8.5B US sports nutrition and hydration market
+- SAM: $2.1B premium/personalized hydration segment (functional hydration, electrolyte products)
+- SOM: $95M (targeting 3.2M wearable-owning fitness enthusiasts in top 10 US metros)
+- Growth Rate: 15% CAGR for functional hydration. Premium segment growing 22% YoY.
+- Why Now: Wearable penetration hit 35% of US adults. Real-time biometric data (sweat rate estimates, heart rate, temp) is now accessible via APIs. Consumers spending 3x more on "functional" beverages than 5 years ago. LMNT, Liquid IV proved the electrolyte category.
+
+TRACTION
+- Revenue: $520K in first 7 months post-launch
+- Bottles sold: 3,800
+- Active pod subscribers: 2,100 (55% of bottle buyers converted to subscription)
+- Monthly subscription churn: 8% (early, limited data)
+- MoM growth: 18% subscriber growth over last 4 months
+- Waitlist for "pro" bottle (next gen): 6,200 sign-ups
+- D2C only. No retail distribution yet.
+
+UNIT ECONOMICS
+- Hardware CAC: $52 (Instagram/TikTok ads primarily)
+- Subscription CAC: $0 incremental (converted at onboarding)
+- Blended CAC: $52
+- LTV: $385 (hardware margin + 8.5-month average subscription life at $29/mo, 72% margin)
+- LTV/CAC: 7.4x
+- Payback Period: 2.1 months
+- Blended Gross Margin: 58%
+- Burn Rate: $88K/month
+- Runway: 8 months
+
+COMPETITION
+1. LMNT - Dominant electrolyte brand. $200M+ revenue. No personalization, no connected hardware.
+2. Hidrate Spark - Smart water bottle (tracks intake). No consumable subscription. Modest traction.
+3. Nuun / Liquid IV - Mass market electrolyte tabs/powders. No wearable integration. Commoditizing.
+- Differentiation: Driftwell is the only product that adjusts electrolyte formulation daily based on actual biometric and activity data. The pods are custom-mixed (sodium, potassium, magnesium ratios vary) based on the user's workout data from the prior day. Creates a data moat and makes switching costly.
+
+TEAM
+- CEO: Jake Morrison, ex-product lead at Whoop (3 years). Built the Whoop recovery score feature. Understands wearable data deeply.
+- CTO: Anika Rao, ex-hardware engineer at Apple (Watch team, 4 years). Designed the bottle's BLE sensor module.
+- Head of Formulation: Dr. Sam Park, sports nutrition PhD, previously R&D lead at Gatorade Sports Science Institute.
+- Red Flag: Jake (CEO) was fired from Whoop, not a voluntary departure. He was let go during a reorganization, but the circumstances are ambiguous -- his former manager declined to provide a reference. Anika and Jake are in a romantic relationship, which the team has disclosed but investors should consider for co-founder dynamics.
+
+CAP TABLE & FINANCING
+- Founders: 72% (Jake 40%, Anika 32%)
+- Friends & family round: 10% via SAFEs at $3M cap
+- Dr. Sam Park: 5% (advisor shares, 2-year vest, 50% vested)
+- Option pool: 13% (2% allocated)
+
+ROUND DETAILS
+- Raising: $2.8M Seed
+- Pre-money Valuation: $11M
+- Post-money Valuation: $13.8M
+- Investor ownership target: 20.3%
+- Use of Proceeds: 40% inventory and supply chain (pod manufacturing scale-up, bottle v2 production), 30% marketing (influencer program, content), 20% engineering (app v2, additional wearable integrations), 10% ops
+
+DATA ROOM EXCERPTS
+- Pod manufacturing is currently done by a single contract manufacturer in Shenzhen. Lead time is 8 weeks. No backup supplier. If supply is disrupted, subscribers receive generic (non-personalized) pods, which undermines the core value proposition.
+- 55% hardware-to-subscription conversion rate is based on a cohort that received the bottle at a 40% early-bird discount. Full-price purchasers convert at only 38%.
+- Wearable API access depends on partnerships with Apple, Garmin, and Whoop. Apple HealthKit is open, but Whoop's API access is via a "beta partner" agreement that can be revoked with 30 days notice. Whoop users represent 42% of Driftwell's subscriber base.
+- Customer reviews (n=340, average 4.2/5) frequently mention "the bottle feels cheap" and "lid leaks during workouts." 15% of warranty claims are for hardware defects.
+- The personalized formulation claim is partially misleading: there are actually only 8 pod variants. The algorithm selects from these 8 based on biometric data. Marketing says "custom-mixed" which implies bespoke formulation.
+
+MESSY DATA POINT
+The 8% monthly churn rate is calculated on subscribers who have been active for 2+ months. First-month churn (buyers who subscribe and cancel within 30 days) is 23%, but this is excluded from the reported metric. Including first-month churn, effective monthly churn rate is 12.5%, which implies an average subscriber life of 8 months, not the 8.5 months used in LTV calculations. This reduces LTV to approximately $350, and LTV/CAC to 6.7x.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Series A",sector:"Marketplace",
+text:`COMPANY SNAPSHOT
+- Name: StudioMatch
+- Sector: B2B Marketplace (Creative Services)
+- Product: Managed marketplace connecting brands with vetted freelance creative teams (designers, videographers, copywriters) for marketing campaigns with built-in project management and payment escrow
+- ICP: Marketing directors at DTC brands with $10M-$200M revenue who need project-based creative work without agency retainers
+- Business Model: 18% take rate on project value (charged to brand). Average project size: $8,500. Freelancer side is free to join but must pass portfolio review.
+
+MARKET
+- TAM: $65B US marketing services outsourcing market
+- SAM: $14B DTC brand creative services segment
+- SOM: $420M (targeting 8,000 DTC brands in the mid-market sweet spot)
+- Growth Rate: 16% CAGR. DTC brands increasingly moving from agencies to flexible freelance teams.
+- Why Now: 72% of DTC marketing directors say agency costs are unsustainable (industry survey). Freelance creative talent pool doubled since 2020 due to remote work normalization. Existing platforms (Fiverr, Upwork) are too horizontal and low-quality for serious brand work.
+
+TRACTION
+- GMV: $14.2M lifetime. $2.8M last quarter (up from $1.9M prior quarter)
+- Revenue: $2.5M ARR (take-rate revenue)
+- Active brands: 180
+- Active freelancers: 620 (from 3,400 applications, 18% acceptance rate)
+- Repeat rate: 74% of brands have booked 3+ projects
+- Average time-to-match: 36 hours
+- Customer satisfaction: 4.6/5 brand rating, 4.3/5 freelancer rating
+
+UNIT ECONOMICS
+- Brand CAC: $1,800 (content marketing + LinkedIn ads + conference sponsorships)
+- Freelancer CAC: $45 (inbound applications, minimal spend)
+- LTV per brand: $24,500 (avg 3.4 projects/year at $8,500, 18% take rate, 2.8-year life)
+- LTV/CAC: 13.6x
+- Gross Margin: 55% (platform ops, quality assurance team, payment processing)
+- Burn Rate: $280K/month
+- Runway: 9 months
+
+COMPETITION
+1. Fiverr/Upwork - Massive scale but no curation, no project management, race to the bottom on price.
+2. Superside - Managed creative service at scale. $400M+ valuation. But they use full-time employees, not freelancers. Higher cost.
+3. Working Not Working - Curated creative talent. Strong in premium segment. Less tech platform, more concierge.
+- Differentiation: StudioMatch is the only platform that assembles pre-vetted creative teams (not just individuals) and provides an integrated Kanban-based project management layer. Brands post a brief, and they receive a proposed team (designer + copywriter + strategist) within 36 hours.
+
+TEAM
+- CEO: Amanda Torres, ex-marketing director at Glossier and then Allbirds. 9 years in DTC brand marketing. Understands the buyer deeply.
+- CTO: Kevin Liu, ex-Thumbtack (marketplace engineering, 5 years). Built matching algorithms for home services.
+- Head of Supply: Diana Ross (really), ex-recruiting lead at Creative Circle (creative staffing agency). Built the freelancer vetting process.
+- Red Flag: Amanda has never been a CEO or founder before. Her operating experience is entirely marketing-side. Financial modeling and fundraising have been led almost entirely by Kevin (CTO), who acknowledges he's stretched thin. They plan to hire a VP Finance with Series A proceeds but have no candidates yet.
+
+CAP TABLE & FINANCING
+- Founders: 62% (Amanda 35%, Kevin 27%)
+- Seed investors: 23% ($3M seed at $10M post from First Round Capital)
+- Diana Ross: 5% (co-founder equity, standard 4-year vest)
+- Option pool: 10% (6% allocated)
+
+ROUND DETAILS
+- Raising: $12M Series A
+- Pre-money Valuation: $48M (19.2x ARR)
+- Post-money Valuation: $60M
+- Lead investor ownership: 20%
+- Use of Proceeds: 40% engineering (AI matching v2, brand self-serve tools), 25% supply expansion (launch in EU markets, recruiter team), 20% sales (outbound team for mid-market brands), 15% ops (VP Finance hire, SOC 2)
+
+DATA ROOM EXCERPTS
+- 25% of GMV comes from 3 brands in the beauty/cosmetics vertical. If any one leaves, revenue impact is 8-10% of ARR. One of these brands has indicated they are building an in-house creative team.
+- Freelancer satisfaction dropped from 4.6 to 4.3 over the past two quarters. Top complaint: "take rate is too high -- I make more on Upwork after fees." 12% of top-rated freelancers have not accepted a project in 60+ days (quiet attrition).
+- StudioMatch's project management tool is used by only 40% of active brands. The rest use their own tools (Asana, Monday) and just use StudioMatch for matching + payment. This undermines the "platform" value prop and makes the product commoditizable.
+- International expansion plan assumes freelancer supply in EU can be built at the same 18% acceptance rate. No data supports this. EU creative markets have different norms around project-based work and invoicing.
+- Platform has experienced 3 payment disputes exceeding $10K each in the last 6 months. Current dispute resolution is manual (Amanda handles personally). No formal policy or escrow-protected resolution process.
+
+MESSY DATA POINT
+The 18% take rate is a blended average. Analysis of the data room shows that 40% of projects are booked at the standard 18% rate, 35% are booked at a negotiated 15% rate (given to high-volume brands), and 25% are booked at a promotional 12% rate (introductory offers for new brands). Effective blended take rate is 15.3%, not 18%. This means actual revenue per project is ~$1,300 not $1,530. The company's financial projections use the 18% headline rate.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Seed",sector:"Fintech",
+text:`COMPANY SNAPSHOT
+- Name: PayBridge
+- Sector: Fintech / Payments
+- Product: Cross-border payroll platform for US companies hiring full-time employees in Latin America, handling compliance, tax withholding, benefits, and same-day local currency payments
+- ICP: HR/People Ops leaders at US tech companies (50-500 employees) with 5-50 LatAm employees
+- Business Model: Per-employee-per-month (PEPM) fee of $49/employee + FX spread of 0.8% on salary conversions
+
+MARKET
+- TAM: $9.5B global employer-of-record and cross-border payroll market
+- SAM: $2.8B US-to-LatAm corridor
+- SOM: $140M (targeting 8,500 US tech companies with LatAm employees)
+- Growth Rate: 32% CAGR. US companies hiring LatAm remote talent growing 45% YoY.
+- Why Now: Post-COVID remote work made LatAm the #1 nearshore talent destination for US companies. Current solutions (Deel, Remote) are global and generic. LatAm has unique complexity: 6 major jurisdictions with different labor laws, mandatory profit-sharing (PTU in Mexico), 13th month salary requirements, and complex social security systems.
+
+TRACTION
+- Revenue: $185K ARR (launched 5 months ago)
+- Customers: 22 companies managing 340 total employees on platform
+- Growth: 40% MoM revenue growth over last 3 months
+- Churn: 0% logo churn (only 5 months of data)
+- Countries live: Mexico, Colombia, Brazil
+- Pipeline: 35 companies in active sales conversations, 60% from inbound
+- NPS: 81 (small sample, n=18)
+
+UNIT ECONOMICS
+- CAC: $2,400 (content marketing, LatAm tech community sponsorships)
+- LTV: $22,000 (avg 15.5 employees per customer, $49 PEPM + FX revenue, assumed 2.5-year life)
+- LTV/CAC: 9.2x
+- Payback Period: 3.2 months
+- Gross Margin: 71% (after local payroll processing costs, compliance, and banking fees)
+- Burn Rate: $75K/month
+- Runway: 10 months
+
+COMPETITION
+1. Deel - Market leader, $12B valuation. 100+ countries. But LatAm coverage is thin, often outsourced to local partners. Customer complaints about compliance errors in Brazil and Mexico.
+2. Remote.com - Similar to Deel. Global coverage, not LatAm-specialized. Slower payout times (3-5 days vs. same-day).
+3. Local payroll providers (e.g., Runa in Mexico) - Country-specific. Companies with employees in 3+ LatAm countries need multiple providers.
+- Differentiation: PayBridge built local banking integrations (Pix in Brazil, SPEI in Mexico, PSE in Colombia) enabling same-day payments. In-house compliance team includes former labor attorneys in each jurisdiction. Competitors route through SWIFT, taking 3-5 days and costing 2-3% in FX fees.
+
+TEAM
+- CEO: Carlos Mendez, born in Mexico City, Stanford MBA. 5 years at Stripe leading LatAm expansion. Deep payments and regulatory knowledge.
+- CTO: Wei Zhang, ex-Wise (TransferWise) engineer. Built FX engine handling $1B+ in annual volume. Strong fintech infrastructure background.
+- Head of Compliance: Isabela Oliveira, former labor attorney in Brazil (8 years), then compliance lead at Globant.
+- Red Flag: Carlos (CEO) was one of 4 candidates for GM of Stripe LatAm. He didn't get the role and left to start PayBridge within 3 months. His departure was professional, but some Stripe colleagues have described the move as "reactive." Additionally, he and Wei have only worked together for 7 months, having met through a Stanford alumni network.
+
+CAP TABLE & FINANCING
+- Founders: 78% (Carlos 48%, Wei 30%)
+- Friends & family: 7% via SAFE at $4M cap
+- Angel investors (3 Stripe/fintech executives): 8% via SAFE at $5M cap
+- Option pool: 7% (2% allocated)
+- Note: The two SAFEs at $4M and $5M caps will create conversion complexity. The $4M cap SAFE holders have an MFN clause.
+
+ROUND DETAILS
+- Raising: $2.5M Seed
+- Pre-money Valuation: $12M
+- Post-money Valuation: $14.5M
+- Investor ownership target: 17.2%
+- Use of Proceeds: 40% engineering (add Argentina, Chile, Peru support; employer dashboard v2), 30% compliance (local entity setup in new countries, legal counsel retainers), 20% sales (2 AEs focused on US tech companies), 10% ops
+
+DATA ROOM EXCERPTS
+- Brazil operations require a local legal entity. PayBridge is currently operating through a partnership with a Brazilian PEO (professional employer organization) that takes a 15% cut of PEPM revenue for Brazil-based employees. 38% of platform employees are in Brazil. This significantly reduces margins on the largest country segment.
+- Same-day payment capability works 92% of the time. 8% of payments are delayed 1-2 days due to local banking system outages or compliance holds. Two customers have flagged this as a trust issue.
+- The FX spread of 0.8% is competitive, but 3 enterprise pipeline prospects have asked for 0.4% or less. Deel has begun offering 0% FX spread as a loss leader for enterprise customers. Pricing pressure is emerging.
+- Carlos maintains advisory relationships with 2 Stripe executives who are also angel investors. If Stripe decides to build its own LatAm payroll product (which is within their strategic scope), these relationships become conflicted.
+- Regulatory risk: Mexico's labor law reform (effective 2026) may require foreign employers to establish local entities. If passed, the EOR model becomes legally questionable in Mexico. PayBridge's largest market (45% of employees) is Mexico.
+
+MESSY DATA POINT
+The 40% MoM revenue growth includes a large one-time customer (a crypto company) that onboarded 45 employees in a single month, representing $26K in new ARR. Without this single customer, MoM growth for the period was 22%. Additionally, the crypto company's financial stability is uncertain -- they recently announced a 20% workforce reduction globally.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Series A",sector:"Deeptech",
+text:`COMPANY SNAPSHOT
+- Name: SonarGrid
+- Sector: Deeptech / Industrial IoT
+- Product: AI-powered acoustic monitoring system that detects mechanical failures in industrial equipment (pumps, compressors, turbines) 2-4 weeks before traditional vibration sensors, using arrays of low-cost MEMS microphones and proprietary ML models
+- ICP: Maintenance directors at oil & gas refineries, chemical plants, and power generation facilities with 500+ rotating equipment assets
+- Business Model: Hardware lease ($200/sensor node/year) + SaaS analytics ($85K-$250K annual platform fee based on asset count). Average ACV: $165K.
+
+MARKET
+- TAM: $28B global predictive maintenance market
+- SAM: $7.2B acoustic and vibration monitoring segment for process industries
+- SOM: $430M (targeting 2,600 large process facilities in North America)
+- Growth Rate: 24% CAGR. Driven by aging infrastructure (average US refinery equipment age: 22 years) and insurance companies mandating predictive maintenance programs.
+- Why Now: MEMS microphone costs dropped 80% in 3 years, making dense acoustic arrays economically viable for the first time. Traditional vibration monitoring (accelerometers) costs $500-2,000 per sensor vs. SonarGrid's $35 MEMS arrays. Insurance premium discounts of 8-15% for predictive maintenance adoption are creating CFO-level buy-in.
+
+TRACTION
+- Revenue: $2.8M ARR
+- Customers: 12 (8 refineries, 3 chemical plants, 1 power generation facility)
+- NRR: 145% (driven by expansion from pilot zones to full facility coverage)
+- Logo retention: 100% (though only 18 months of operating history)
+- Growth: 85% YoY ARR growth
+- Sales cycle: 120-180 days (long procurement cycles in heavy industry)
+- Pipeline: $8.5M qualified pipeline. 2 proposals pending with top-5 oil majors.
+
+UNIT ECONOMICS
+- CAC: $85,000 (requires in-person demos, on-site pilots, multi-stakeholder sales)
+- LTV: $660,000 (based on 100% retention, 145% NRR, conservative 4-year life)
+- LTV/CAC: 7.8x
+- Payback Period: 6.2 months
+- Gross Margin: 74% (hardware + software blended)
+- Burn Rate: $380K/month
+- Runway: 7 months
+
+COMPETITION
+1. SKF (Condition Monitoring) - $2B+ division. Vibration-based. Industry incumbent. 30-year relationships with maintenance teams. Their sensor technology is proven but expensive and catches failures later.
+2. Augury - $300M+ raised. Vibration + AI. Strong in commercial HVAC. Limited heavy industry traction due to sensor cost per point.
+3. Petasense - Wireless vibration monitoring. Good mid-market product. Less sophisticated ML models.
+- Differentiation: Acoustic monitoring detects failure modes that vibration sensors miss entirely (bearing lubrication degradation, cavitation in pumps, internal valve leaks). SonarGrid's sensor arrays cost 95% less per monitoring point, enabling 10x denser coverage. The ML model has been trained on 14,000 hours of labeled failure audio from partnership with Southwest Research Institute.
+
+TEAM
+- CEO: Dr. Alan Cheng, PhD in Acoustics from MIT. 10 years at GE Aviation working on jet engine acoustic diagnostics. Holds 6 patents in acoustic sensing.
+- CTO: Samantha Brooks, ex-Apple (AirPods acoustic engineering team, 4 years). Hardware expertise is excellent.
+- VP Sales: Robert "Rob" Hartman, 20 years selling industrial automation to refineries. Ex-Honeywell and Emerson. Massive industry rolodex.
+- Red Flag: Dr. Cheng is a brilliant scientist but has struggled with delegation. He personally reviews every customer report and has been a bottleneck on onboarding. Two senior engineers have left citing "micromanagement." Samantha (CTO) is also commuting from Austin to the Houston office 3 days/week, creating communication gaps.
+
+CAP TABLE & FINANCING
+- Founders: 55% (Alan 35%, Samantha 20%)
+- Seed investors: 25% ($4M seed at $12M post-money from Eclipse Ventures, an industrial VC)
+- Rob Hartman: 5% (co-founder level equity, 4-year vest, given for bringing initial customer relationships)
+- Option pool: 12% (7% allocated)
+- Small SAFE: 3% from Southwest Research Institute's venture arm at $18M cap
+
+ROUND DETAILS
+- Raising: $18M Series A
+- Pre-money Valuation: $72M (25.7x ARR)
+- Post-money Valuation: $90M
+- Lead investor ownership: 20%
+- Use of Proceeds: 35% R&D (next-gen sensor array, edge computing module), 30% sales (expand from 2 to 8 sales engineers, open Midwest office), 20% customer success (build deployment team to reduce onboarding from 8 weeks to 3 weeks), 15% manufacturing (transition from contract manufacturing to owned production line)
+
+DATA ROOM EXCERPTS
+- Of 12 customers, 4 were acquired through Rob Hartman's personal relationships from his Honeywell days. If Rob leaves, customer renewal risk is significant. No formal customer success handoff process exists.
+- The acoustic ML model has a false positive rate of 4.2% (it flags failures that don't materialize). In refineries, each false positive triggers a $15K-$50K inspection. Three customers have escalated complaints about false positives disrupting operations.
+- SonarGrid's MEMS microphone arrays are sourced exclusively from a single supplier (Knowles Corporation). A 6-month global MEMS shortage in 2024 delayed 2 customer deployments by 10 weeks. No alternate supplier qualified.
+- The partnership with Southwest Research Institute (SwRI) grants SonarGrid exclusive access to their labeled failure audio dataset, but the exclusivity expires in 14 months. SwRI has been approached by SKF about a similar arrangement.
+- Onboarding currently requires 2 SonarGrid engineers on-site for 3-5 weeks per customer installation. At 12 customers, this is manageable. The company plans to sign 25+ customers in the next 18 months. Current engineering team cannot support this deployment pace without a 3x headcount increase.
+
+MESSY DATA POINT
+The 145% NRR is accurate but driven disproportionately by 2 customers who expanded from pilot zones (50 assets) to full facility coverage (500+ assets each). These 2 expansions represent $980K of the $1.2M in net expansion ARR. Without these 2 expansions, NRR is 108%. The company presents 145% as representative, but the expansion playbook has not been validated across the broader customer base.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Seed",sector:"SaaS",
+text:`COMPANY SNAPSHOT
+- Name: Clairvoy
+- Sector: B2B SaaS (Revenue Operations)
+- Product: AI-powered revenue forecasting platform that analyzes CRM activity data, email sentiment, calendar patterns, and billing signals to generate bottoms-up sales forecasts with 92% accuracy (vs. 55% industry average for rep-submitted forecasts)
+- ICP: VP of Sales or CRO at B2B SaaS companies with 20-200 sales reps and $10M-$200M ARR
+- Business Model: Annual SaaS subscription based on seat count. Average ACV: $38K. Enterprise tier (200+ reps): $85K.
+
+MARKET
+- TAM: $8.2B revenue intelligence and sales analytics market
+- SAM: $3.1B sales forecasting and pipeline management segment
+- SOM: $155M (targeting 4,100 mid-market B2B SaaS companies in the US)
+- Growth Rate: 26% CAGR. Driven by post-2023 sales efficiency mandates and CFO pressure on forecast accuracy.
+- Why Now: Sales teams cut 20-30% during 2023 downturn. Remaining reps carry larger books. Manual forecasting is breaking. CROs now report to CFOs more often (40% vs. 25% pre-2023), creating demand for data-driven forecasts that satisfy financial rigor.
+
+TRACTION
+- $290K ARR (launched 6 months ago)
+- 8 paying customers
+- Pipeline: $580K in active opportunities
+- Growth: Added $180K in net new ARR in last 3 months
+- Win rate from POC to paid: 62% (8 of 13 POCs converted)
+- Logo churn: 0% (limited data, 6 months)
+- NPS: 78 (n=8, small sample)
+- Key metric: Customers report average 34% improvement in forecast accuracy within 60 days of implementation
+
+UNIT ECONOMICS
+- CAC: $15,000 (LinkedIn outbound + CRO community events + free 30-day POC)
+- LTV: $114,000 (based on $38K ACV, assumed 85% retention, 3.5-year average life)
+- LTV/CAC: 7.6x
+- Payback Period: 4.7 months
+- Gross Margin: 83%
+- Burn Rate: $72K/month
+- Runway: 12 months
+
+COMPETITION
+1. Clari - Market leader in revenue intelligence. $500M+ raised. $2.6B valuation. Broad platform with forecasting, pipeline management, and deal inspection. Powerful but complex and expensive ($100K+ ACV for enterprise).
+2. Gong - Conversation intelligence expanding into forecasting. $7.2B peak valuation. Strong brand but forecasting is a bolt-on, not core.
+3. BoostUp - Direct competitor in AI forecasting. $55M raised. Similar positioning but has struggled with accuracy claims.
+- Differentiation: Clairvoy is signal-first, not activity-first. Instead of tracking what reps do, it analyzes what buyers do (email response velocity, meeting attendance patterns, contract view tracking). This makes it harder for reps to game the forecast. 92% accuracy claim validated by 3 customers over 2 quarters of data.
+
+TEAM
+- CEO: Rachel Tanaka, ex-VP of RevOps at Datadog. Built the forecasting function that supported Datadog's scale from $200M to $1.5B ARR. Deeply understands the buyer persona.
+- CTO: Omar Hassan, ex-Meta AI research (3 years), then lead ML engineer at People.ai. Built prediction models for sales outcomes.
+- First sales hire: Jordan Lee, ex-Clari AE. Joined 2 months ago. Brings competitive intelligence but also potential IP/non-compete concerns.
+- Red Flag: Rachel has never been a CEO. Her experience is entirely in operations roles where she had organizational support. She has been stretched across product, sales, fundraising, and HR simultaneously. Omar is deeply technical but has communication challenges -- 2 of 8 customer calls he led resulted in "too technical" feedback from buyer personas who are sales leaders, not engineers.
+
+CAP TABLE & FINANCING
+- Founders: 82% (Rachel 50%, Omar 32%)
+- Pre-seed angels: 10% via SAFE at $3.5M cap (includes 2 Datadog executives and a CRO from a public SaaS company)
+- Option pool: 8% (1.5% allocated)
+- Note: Slim option pool. Will need expansion at seed to attract senior hires.
+
+ROUND DETAILS
+- Raising: $2M Seed
+- Pre-money Valuation: $10M
+- Post-money Valuation: $12M
+- Investor ownership target: 16.7%
+- Use of Proceeds: 45% engineering (data integrations -- Salesforce, HubSpot, Outreach; model improvements), 30% sales (2 AEs + marketing), 15% customer success (1 CSM, onboarding playbook), 10% ops
+
+DATA ROOM EXCERPTS
+- The 92% forecast accuracy claim is based on a specific definition: "within 10% of actual quarterly revenue." By a stricter definition (within 5%), accuracy drops to 71%. The accuracy also varies significantly by customer: 2 customers see 95%+ accuracy, 3 see 85-90%, and 3 see 78-82%. Accuracy correlates with CRM data hygiene -- garbage in, garbage out.
+- Integration with Salesforce is complete. HubSpot integration is 70% done. 40% of pipeline prospects use HubSpot, creating a near-term constraint on addressable market.
+- Jordan Lee (first sales hire) left Clari 45 days ago. His non-compete states 12 months. Clari has historically not enforced non-competes, but Clairvoy is a direct competitor. Legal counsel rates litigation risk at 20%.
+- Customer #3 (a $52K ACV enterprise account) was closed on terms that include a 6-month "out clause" if accuracy doesn't meet benchmarks. This customer alone represents 18% of ARR.
+- Rachel and Omar have a 50/32 equity split, but Rachel's friends and family contributed $150K of the pre-seed funding and hold SAFE notes. This creates dual-hat dynamics where Rachel is both co-founder and connected to early investor interests.
+
+MESSY DATA POINT
+The $290K ARR figure includes a $45K annual contract with a company where Rachel's former Datadog colleague is the CRO. This customer was signed at a 40% discount and with an unusual "pay quarterly in arrears" structure (not standard prepaid annual). Excluding this customer, ARR is $245K and all remaining customers are on standard terms. The company lists the discounted customer as evidence of "enterprise traction" in the deck.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Series A",sector:"SaaS",
+text:`COMPANY SNAPSHOT
+- Name: ComplianceOS
+- Sector: B2B SaaS (RegTech / Compliance)
+- Product: Unified compliance automation platform that maps regulatory requirements (SOC 2, ISO 27001, HIPAA, GDPR, SOX) to a company's existing tech stack and auto-generates evidence, tracks controls, and prepares audit-ready reports
+- ICP: Head of Security or Compliance Officer at SaaS companies and fintechs with 100-2,000 employees navigating multi-framework compliance
+- Business Model: Annual SaaS subscription. Base tier: $24K/year (1 framework). Multi-framework: $65K/year. Enterprise: $120K+. Average ACV: $52K.
+
+MARKET
+- TAM: $16B global GRC (governance, risk, compliance) software market
+- SAM: $4.8B cloud-native compliance automation segment
+- SOM: $290M (targeting 5,600 SaaS and fintech companies in the US with multi-framework needs)
+- Growth Rate: 28% CAGR. Accelerated by proliferating frameworks -- average company now maintains 3.2 compliance frameworks (up from 1.8 three years ago). SOC 2 has become a sales requirement for 85% of enterprise SaaS purchases.
+- Why Now: Compliance burden is growing exponentially while security teams are flat or shrinking. Manual compliance costs $150K-$500K/year per framework (auditor fees + internal time). AI can automate 60-70% of evidence collection and control monitoring.
+
+TRACTION
+- $4.5M ARR
+- 87 paying customers
+- NRR: 132% (driven by customers adding frameworks: avg customer starts with 1.4 frameworks, expands to 2.3 within 12 months)
+- Logo retention: 94% annually
+- Growth: 95% YoY ARR growth
+- Sales cycle: 45-60 days
+- Pipeline: $7.8M in qualified pipeline
+- Win rate: 38% overall, 52% against Vanta (primary competitor) in head-to-head
+
+UNIT ECONOMICS
+- CAC: $28,000 (inbound-heavy: SEO, compliance community content, G2/Gartner reviews)
+- LTV: $234,000 (based on 94% retention, 132% NRR, 3.8-year average life)
+- LTV/CAC: 8.4x
+- Payback Period: 6.5 months
+- Gross Margin: 82%
+- Burn Rate: $450K/month
+- Runway: 6 months (urgent raise)
+
+COMPETITION
+1. Vanta - Market leader. $250M+ raised, $2.5B valuation. Fast execution, strong SMB. Moving upmarket aggressively. Primary competitive threat.
+2. Drata - $328M raised. Strong product, but growth has slowed and recent layoffs suggest GTM challenges.
+3. Secureframe - $79M raised. Good product, but smaller team and less enterprise traction.
+- Differentiation: ComplianceOS is the only platform with a proprietary "Regulatory Graph" that maps dependencies across frameworks. When you satisfy a control for SOC 2, the platform automatically identifies which ISO 27001, HIPAA, and GDPR requirements are also satisfied (or partially satisfied), reducing redundant work by 40%. Vanta and Drata treat each framework independently.
+
+TEAM
+- CEO: Michael Torres, ex-Head of Compliance at Plaid. Built Plaid's compliance program from scratch across 6 frameworks. Deep regulatory expertise.
+- CTO: Sarah Kwon, ex-Palantir (6 years, built data integration platforms). Strong systems architecture background.
+- VP Sales: Derek Yang, ex-Vanta (top AE, 2 years). Left Vanta citing "ceiling on growth." Deep competitive knowledge.
+- Red Flag: Derek left Vanta only 4 months ago and brought detailed competitive intelligence, including Vanta's pricing playbook and enterprise roadmap. While no formal NDA breach has been alleged, this creates legal and ethical risk. Additionally, Michael (CEO) is going through a publicly contentious divorce that has occasionally affected his availability -- he missed 3 board meetings in the last quarter.
+
+CAP TABLE & FINANCING
+- Founders: 50% (Michael 30%, Sarah 20%)
+- Seed investors: 28% ($5M seed at $12.5M post-money led by Accel)
+- Derek Yang: 4% (co-founder level equity as condition of joining)
+- Option pool: 14% (9% allocated, 5% remaining)
+- Advisors: 4%
+
+ROUND DETAILS
+- Raising: $20M Series A
+- Pre-money Valuation: $80M (17.8x ARR)
+- Post-money Valuation: $100M
+- Lead investor ownership: 20%
+- Use of Proceeds: 30% engineering (AI evidence generation v2, SOX compliance module for public companies), 30% GTM (scale sales from 6 to 18 AEs, launch partner channel with Big 4 auditors), 20% customer success, 10% international (UK entity for GDPR customers), 10% ops
+
+DATA ROOM EXCERPTS
+- 87 customers, but 35 are on the $24K base tier with only 1 framework. These customers have the highest churn (12% annually) and lowest expansion potential. Without them, the customer base is 52 high-value accounts with 97% retention.
+- Derek's Vanta competitive intelligence has been incorporated into sales battle cards used by the entire team. If Vanta discovers this and takes legal action, the distraction and potential damages could be significant. Company has not sought formal legal review of the battle card content.
+- The "Regulatory Graph" -- the core differentiator -- was built by Sarah (CTO) and one senior engineer. If either leaves, institutional knowledge risk is extreme. No documentation of the graph's logic exists beyond code comments.
+- ComplianceOS failed a prospect's security assessment last quarter because the company itself had not completed its own SOC 2 Type II audit. The irony was noted publicly on LinkedIn by the prospect's CISO. SOC 2 Type II is now in progress (expected completion: 3 months).
+- The company's own compliance posture has been deprioritized: 3 critical security controls (MFA enforcement on all systems, endpoint encryption, and access review logs) are flagged as "in progress" in their internal dashboard. A compliance platform with incomplete compliance is a reputational time bomb.
+
+MESSY DATA POINT
+The 95% YoY ARR growth and 132% NRR are both accurate, but a deeper look reveals that 30% of net new ARR in the last 6 months came from 4 customers who were migrating off Drata due to Drata's service disruptions and layoffs. This is a one-time competitive tailwind, not a repeatable growth driver. The company's growth rate excluding Drata refugees is 68% YoY -- still strong but meaningfully different from the headline number.
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+},
+{
+stage:"Seed",sector:"Marketplace",
+text:`COMPANY SNAPSHOT
+- Name: LabShare
+- Sector: B2B Marketplace (Life Sciences)
+- Product: Two-sided marketplace connecting biotech startups with underutilized laboratory equipment and bench space at universities and established pharma companies
+- ICP: Supply side: University tech transfer offices and pharma R&D facility managers with idle capacity. Demand side: Pre-clinical biotech startups that cannot afford to build or lease dedicated lab space.
+- Business Model: 12% take rate on booking value (charged to the biotech renter). Average booking: $4,200/month. Equipment rentals charged hourly ($50-500/hr depending on instrument).
+
+MARKET
+- TAM: $18B US shared lab and research services market
+- SAM: $5.2B segment covering flexible/on-demand lab access
+- SOM: $180M (targeting 3,200 pre-clinical biotechs and 400 university/pharma facilities in the top 12 biotech hubs)
+- Growth Rate: 19% CAGR. Biotech startups raised $45B in 2024 but 60% lack dedicated lab space. University lab utilization averages 45% (massive idle capacity).
+- Why Now: Lab real estate costs up 35% since 2021 in top biotech hubs (Boston, SF, San Diego). Biotech funding has rebounded, but investors are demanding capital efficiency -- startups can't justify $2M+ buildouts for pre-clinical work. Meanwhile, universities face budget pressure and want to monetize idle equipment.
+
+TRACTION
+- GMV: $2.1M lifetime ($680K last quarter, up from $340K prior quarter)
+- Revenue: $252K total ($82K last quarter from take rate)
+- Active biotech renters: 34
+- Active facility hosts: 18 (12 universities, 6 pharma/CROs)
+- Repeat booking rate: 68% (renters re-booking within 60 days)
+- Average booking duration: 3.2 months
+- Waitlist: 85 biotechs in 4 markets where supply is not yet available
+
+UNIT ECONOMICS
+- Biotech CAC: $1,400 (conference presence, LinkedIn, biotech incubator partnerships)
+- Facility CAC: $3,200 (direct outreach to tech transfer offices, takes 2-3 months to onboard)
+- Blended CAC: $1,900
+- LTV per biotech renter: $14,800 (avg $4,200/month, 3.2-month avg booking, 2.1 bookings per year, 12% take rate, 1.8-year platform life)
+- LTV/CAC: 7.8x
+- Gross Margin: 62% (after insurance, facility onboarding costs, and equipment verification)
+- Burn Rate: $68K/month
+- Runway: 11 months
+
+COMPETITION
+1. BioLabs - Premium shared lab space operator. $100M+ invested in physical locations. Fixed leases, not on-demand. Expensive ($8K+/month per bench).
+2. Science Exchange - Research services marketplace (CRO matching). Different use case: outsourcing experiments, not renting space/equipment.
+3. Quartzy - Lab supply ordering platform. No space or equipment marketplace. Potential acquirer.
+- Differentiation: LabShare is the only platform offering on-demand, short-term access to specific instruments (not just bench space). A biotech can book a flow cytometer at MIT for 8 hours next Tuesday. No competitor enables this. Built-in liability insurance covers both parties, removing the #1 barrier to institutional participation.
+
+TEAM
+- CEO: Dr. Maya Singh, PhD in Molecular Biology from UCSF. Postdoc at Harvard. 3 years in biotech startup operations. Experienced the lab-access problem firsthand.
+- CTO: Eric Walsh, ex-Airbnb engineer (marketplace search and trust team, 4 years). Understands two-sided marketplace dynamics.
+- Head of Supply: Dr. Patricia Hernandez, former tech transfer officer at MIT. Spent 10 years licensing university IP and managing lab facilities. Brings credibility and institutional relationships.
+- Red Flag: Maya (CEO) has no business or management experience beyond a 3-year ops role at a 15-person biotech that ultimately failed (ran out of funding). She is passionate and domain-expert, but investors have noted she struggles with financial modeling and strategic prioritization. In diligence calls, she tends to dive into scientific detail rather than business metrics.
+
+CAP TABLE & FINANCING
+- Founders: 76% (Maya 45%, Eric 31%)
+- Pre-seed angels: 12% via SAFE at $3.5M cap (includes a prominent biotech VC partner investing personally)
+- Dr. Patricia Hernandez: 4% (advisor shares, 3-year vest)
+- Option pool: 8% (1.5% allocated)
+
+ROUND DETAILS
+- Raising: $2M Seed
+- Pre-money Valuation: $8M
+- Post-money Valuation: $10M
+- Investor ownership target: 20%
+- Use of Proceeds: 40% supply expansion (onboard 30 new facilities in Boston, SF, San Diego, Research Triangle), 30% engineering (scheduling system, equipment tracking, automated billing), 20% demand generation (biotech community presence, incubator partnerships), 10% legal/insurance (facility agreements, liability frameworks)
+
+DATA ROOM EXCERPTS
+- 3 of the 18 host facilities are responsible for 52% of total GMV. If any one leaves, supply liquidity collapses in that market. The largest host (a major Boston university) has hinted at building their own internal booking system.
+- Equipment verification process is manual. LabShare has no system to confirm that instruments are properly calibrated or maintained. One biotech reported that a rented mass spectrometer was miscalibrated, potentially compromising 6 weeks of experimental data. No formal dispute resolution process exists.
+- University legal departments have been slow to approve the LabShare liability framework. Average time from first contact to signed agreement is 5.5 months. Only 4 of 18 facilities completed onboarding in under 3 months.
+- The biotech VC partner investing personally (pre-seed) has begun recommending LabShare to their portfolio companies. 9 of 34 active renters are from this single VC's portfolio. This is great for growth but creates concentration risk and questions about organic demand.
+- Insurance costs are rising. The current policy covers $5M aggregate. A single significant lab incident (chemical spill, equipment damage, data loss) could exceed coverage. Premium renewal in 4 months is expected to increase 25-40%.
+
+MESSY DATA POINT
+The 68% repeat booking rate is measured by "biotech accounts," but many of these "repeat" bookings are extensions of existing bookings, not new project bookings. When measured by distinct new project bookings, the repeat rate drops to 41%. Additionally, 6 of the 34 active renters are in "month-to-month" holdover after their initial booking ended -- they haven't actively re-engaged with the platform but haven't canceled either. The company counts them as "active."
+
+----------------------------------------------
+
+MEMO TEMPLATE - You have 8 minutes. Write your memo now:
+
+A. One-line recommendation (Invest / Pass / Needs More Data)
+B. 3-bullet investment thesis
+C. Market & timing
+D. Product & defensibility
+E. Traction & unit economics
+F. Team assessment
+G. Key risks (ranked) + mitigation / diligence plan. Include explicit kill criteria.
+H. Valuation & ownership
+I. Deal terms stance
+J. What must be true (3) + What could go wrong (3)
+K. 10 prioritized diligence questions
+L. IC / Judge Q&A prep`
+}
+];
+
+// ══════════════════════════════════════════
+// State
+// ══════════════════════════════════════════
+let repCount = 1;
+let selectedStage = 'Seed';
+let selectedSector = 'Random';
+let timerInterval = null;
+let timeLeft = 480;
+let timerRunning = false;
+let currentCaseText = '';
+let usedCases = [];
+
+// ══════════════════════════════════════════
+// API Key (optional)
+// ══════════════════════════════════════════
+function saveApiKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (key) {
+    localStorage.setItem('anthropic_api_key', key);
+    const s = document.getElementById('apiStatus');
+    s.textContent = 'Key saved. AI scoring is enabled.';
+    s.className = 'api-status connected';
+  }
+}
+function getApiKey() { return localStorage.getItem('anthropic_api_key') || ''; }
+window.addEventListener('load', () => {
+  const saved = getApiKey();
+  if (saved) {
+    document.getElementById('apiKey').value = saved;
+    document.getElementById('apiStatus').textContent = 'Key loaded. AI scoring enabled.';
+    document.getElementById('apiStatus').className = 'api-status connected';
+  }
+});
+
+// ══════════════════════════════════════════
+// Selectors
+// ══════════════════════════════════════════
+function selectStage(el) {
+  document.querySelectorAll('[data-stage]').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedStage = el.dataset.stage;
+}
+function selectSector(el) {
+  document.querySelectorAll('[data-sector]').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedSector = el.dataset.sector;
+}
+
+// ══════════════════════════════════════════
+// Timer
+// ══════════════════════════════════════════
+function updateTimerDisplay() {
+  const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+  const s = String(timeLeft % 60).padStart(2, '0');
+  const el = document.getElementById('timer');
+  el.textContent = `${m}:${s}`;
+  el.className = 'timer-display' + (timeLeft <= 60 ? ' danger' : timeLeft <= 180 ? ' warning' : '');
+}
+function startTimer() {
+  if (timerRunning) return;
+  timerRunning = true;
+  timerInterval = setInterval(() => {
+    if (timeLeft > 0) { timeLeft--; updateTimerDisplay(); }
+    else { pauseTimer(); }
+  }, 1000);
+}
+function pauseTimer() { timerRunning = false; clearInterval(timerInterval); }
+function resetTimer() { pauseTimer(); timeLeft = 480; updateTimerDisplay(); }
+
+// ══════════════════════════════════════════
+// Phase
+// ══════════════════════════════════════════
+function setPhase(num) {
+  for (let i = 1; i <= 4; i++) {
+    document.getElementById('p' + i).className = 'phase' + (i < num ? ' done' : i === num ? ' active' : '');
+    document.getElementById('pl' + i).className = 'phase-label' + (i < num ? ' done' : i === num ? ' active' : '');
+  }
+}
+
+// ══════════════════════════════════════════
+// Case Generation (from embedded bank)
+// ══════════════════════════════════════════
+function generateCase() {
+  let pool = CASES.filter(c => {
+    const stageMatch = c.stage === selectedStage;
+    const sectorMatch = selectedSector === 'Random' || c.sector === selectedSector;
+    const notUsed = !usedCases.includes(CASES.indexOf(c));
+    return stageMatch && sectorMatch && notUsed;
+  });
+
+  // If all matching cases used, reset
+  if (pool.length === 0) {
+    usedCases = [];
+    pool = CASES.filter(c => {
+      const stageMatch = c.stage === selectedStage;
+      const sectorMatch = selectedSector === 'Random' || c.sector === selectedSector;
+      return stageMatch && sectorMatch;
+    });
+  }
+
+  // If still nothing (weird filter combo), fallback to any unused
+  if (pool.length === 0) {
+    pool = CASES.filter((_, i) => !usedCases.includes(i));
+    if (pool.length === 0) { usedCases = []; pool = [...CASES]; }
+  }
+
+  const chosen = pool[Math.floor(Math.random() * pool.length)];
+  const idx = CASES.indexOf(chosen);
+  usedCases.push(idx);
+
+  currentCaseText = chosen.text;
+  document.getElementById('caseContent').textContent = chosen.text;
+  document.getElementById('caseSection').style.display = 'block';
+  setPhase(1);
+
+  document.getElementById('caseSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showMemo() {
+  document.getElementById('memoSection').style.display = 'block';
+  setPhase(2);
+  resetTimer();
+  startTimer();
+  document.getElementById('memoSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ══════════════════════════════════════════
+// API Call (for scoring, optional)
+// ══════════════════════════════════════════
+const SYSTEM_PROMPT = `You are the "VCIC Deal Memo Gym" scoring engine. You evaluate investment memos written under time pressure for VCIC competition practice.
+
+OUTPUT RULES:
+- Plain text and bullets only
+- No markdown formatting (no **, no ##, no backticks)
+- Use ALL CAPS for section headings
+- Use simple dashes (-) for bullet points
+- Be harsh but fair. This is competition prep.
+
+JUDGE AWARENESS: For each section, label: "Scores points" / "Neutral" / "Loses points". Penalize hedgy language, lack of prioritization, weak ownership math, unclear conviction.
+
+CONVICTION RULE: If everything sounds equally important, treat it as a failure. Force explicit ranking.`;
+
+async function callClaude(messages, onChunk) {
+  const key = getApiKey();
+  if (!key) return null;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      system: SYSTEM_PROMPT,
+      stream: true,
+      messages: messages
+    })
+  });
+
+  if (!response.ok) throw new Error(`API Error ${response.status}`);
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let fullText = '', buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        const data = line.slice(6);
+        if (data === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            fullText += parsed.delta.text;
+            if (onChunk) onChunk(fullText);
+          }
+        } catch (e) {}
+      }
+    }
+  }
+  return fullText;
+}
+
+// ══════════════════════════════════════════
+// Submit Memo
+// ══════════════════════════════════════════
+async function submitMemo() {
+  pauseTimer();
+
+  const sections = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+  const labels = [
+    'One-line recommendation','3-bullet investment thesis','Market & timing',
+    'Product & defensibility','Traction & unit economics','Team assessment',
+    'Key risks (ranked) + kill criteria','Valuation & ownership','Deal terms stance',
+    'What must be true / What could go wrong','10 prioritized diligence questions','IC / Judge Q&A prep'
+  ];
+
+  let memoText = '';
+  sections.forEach((s, i) => {
+    const val = document.getElementById('memo' + s).value.trim();
+    memoText += `${s}. ${labels[i]}:\n${val || '[LEFT BLANK]'}\n\n`;
+  });
+
+  const hasApiKey = !!getApiKey();
+
+  document.getElementById('feedbackSection').style.display = 'block';
+  setPhase(3);
+
+  if (hasApiKey) {
+    // AI-powered scoring
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Scoring with AI...';
+    document.getElementById('feedbackContent').textContent = 'Analyzing your memo...';
+
+    const prompt = `Here is my investment memo:\n\n${memoText}\n---\nOriginal case:\n${currentCaseText}\n---\n
+Return in THIS ORDER with ALL CAPS headings:
+
+SECTION-BY-SECTION SCORES (A-L, 0-5)
+Score each section. Brief explanation.
+
+JUDGE POV
+For each section: "Scores points" / "Neutral" / "Loses points"
+
+KEY WEAKNESSES (PRIORITIZED)
+Ranked by severity.
+
+GOLD STANDARD VCIC MEMO (350-500 WORDS)
+Best possible memo for this case using A-L template.
+
+RED TEAM JUDGE QUESTIONS (6)
+Six tough questions with best answers.
+
+MICRO-DRILLS (3)
+Three targeted 2-minute exercises.`;
+
+    try {
+      const result = await callClaude(
+        [{ role: 'user', content: prompt }],
+        (partial) => { document.getElementById('feedbackContent').textContent = partial; }
+      );
+
+      if (result) {
+        const goldMatch = result.match(/GOLD STANDARD[\s\S]*?(?=RED TEAM|$)/i);
+        const redTeamMatch = result.match(/RED TEAM[\s\S]*?(?=MICRO-DRILL|$)/i);
+        const drillsMatch = result.match(/MICRO-DRILL[\s\S]*$/i);
+        const mainEnd = result.search(/GOLD STANDARD/i);
+        document.getElementById('feedbackContent').textContent = (mainEnd > 0 ? result.substring(0, mainEnd) : result).trim();
+
+        if (goldMatch) { document.getElementById('goldSection').style.display = 'block'; document.getElementById('goldContent').textContent = goldMatch[0].trim(); }
+        if (redTeamMatch) { document.getElementById('redTeamSection').style.display = 'block'; document.getElementById('redTeamContent').textContent = redTeamMatch[0].trim(); }
+        if (drillsMatch) { document.getElementById('drillsSection').style.display = 'block'; document.getElementById('drillsContent').textContent = drillsMatch[0].trim(); }
+      }
+    } catch (e) {
+      document.getElementById('feedbackContent').textContent = 'API Error: ' + e.message + '\n\nFalling back to self-assessment mode.';
+      showSelfAssessment(memoText);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = 'Submit for Scoring';
+  } else {
+    showSelfAssessment(memoText);
+  }
+
+  setPhase(4);
+  document.getElementById('feedbackSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showSelfAssessment(memoText) {
+  const rubric = `SELF-ASSESSMENT RUBRIC
+Score each section 0-5 and be honest with yourself.
+
+A. RECOMMENDATION (0-5)
+- 5: Clear invest/pass with one-sentence conviction. No hedge words.
+- 3: Has a recommendation but uses "might" or "could consider"
+- 1: Vague, no clear stance
+- 0: Left blank
+
+B. INVESTMENT THESIS (0-5)
+- 5: Three distinct, prioritized bullets. Each could stand alone as a reason to invest. No overlap.
+- 3: Three bullets but generic or overlapping
+- 1: Only one bullet, or all three say the same thing
+- 0: Left blank
+
+C. MARKET & TIMING (0-5)
+- 5: References specific TAM/SAM/SOM numbers from the case. Identifies the "why now" catalyst. Notes growth rate.
+- 3: Mentions market size but no specifics or no "why now"
+- 1: Generic "big market" statement
+- 0: Left blank
+
+D. PRODUCT & DEFENSIBILITY (0-5)
+- 5: Identifies specific moat (data, network effects, switching costs, IP). Explains WHY competitors can't replicate easily.
+- 3: Mentions product strengths but no defensibility analysis
+- 1: Just restates the product description from the case
+- 0: Left blank
+
+E. TRACTION & UNIT ECONOMICS (0-5)
+- 5: Cites specific metrics from the case. Flags the messy data point. Does the math yourself (e.g., corrected ARR, real LTV/CAC).
+- 3: Cites some numbers but misses the messy data point
+- 1: Vague reference to "good traction"
+- 0: Left blank
+
+F. TEAM (0-5)
+- 5: Identifies the red flag. Assesses founder-market fit with specifics. Notes gaps and hiring needs.
+- 3: Generic "strong team" or identifies red flag but doesn't assess impact
+- 1: Just restates founder bios from the case
+- 0: Left blank
+
+G. RISKS (0-5)
+- 5: 3+ risks explicitly ranked by severity. Each has a mitigation or diligence step. Clear kill criteria stated.
+- 3: Lists risks but no ranking or no kill criteria
+- 1: One risk mentioned with no mitigation plan
+- 0: Left blank
+
+H. VALUATION & OWNERSHIP (0-5)
+- 5: References pre/post money. Calculates ownership. Ties to fund return math. Compares to comps.
+- 3: Mentions valuation but no ownership math
+- 1: "Valuation seems fair/high"
+- 0: Left blank
+
+I. DEAL TERMS (0-5)
+- 5: Specific asks (liquidation pref, pro-rata, board seat/observer). Ties terms to risk mitigation.
+- 3: Generic term preferences
+- 1: "Standard terms"
+- 0: Left blank
+
+J. WHAT MUST BE TRUE / WHAT BREAKS (0-5)
+- 5: 3 specific conditions for success + 3 specific failure modes. Each is testable and distinct.
+- 3: Has items but they overlap or are generic
+- 1: Only 1-2 items total
+- 0: Left blank
+
+K. DILIGENCE QUESTIONS (0-5)
+- 5: 10 questions, clearly ranked by decision impact. Top 3 could change the recommendation.
+- 3: Has questions but not ranked, or generic
+- 1: Fewer than 5 questions
+- 0: Left blank
+
+L. IC / JUDGE Q&A (0-5)
+- 5: Anticipates 3+ tough questions with prepared answers. Shows awareness of weak spots.
+- 3: Some Q&A prep but answers are defensive or vague
+- 1: Single question, no answer
+- 0: Left blank
+
+----------------------------------------------
+
+TOTAL YOUR SCORE: ___/60
+
+- 48-60: Strong VCIC performance. Top quartile.
+- 36-47: Competitive. Polish your weak sections.
+- 24-35: Needs significant practice. Focus on conviction and specificity.
+- Below 24: Go back to the case and re-read. Identify what you missed.
+
+----------------------------------------------
+
+KEY QUESTIONS TO ASK YOURSELF:
+
+1. Did I catch the messy data point? Did I correct the numbers?
+2. Did I identify the red flag in the team section?
+3. Are my risks RANKED, or did I list them equally?
+4. Do I have a specific kill criterion, or just vague concerns?
+5. Could a judge tell my recommendation from reading just section A?
+6. Did I do ownership math, or just restate the valuation from the case?
+
+Tip: Copy your memo and paste it into Claude (claude.ai) along with the case packet for AI-powered feedback and a gold standard memo.`;
+
+  document.getElementById('feedbackContent').textContent = rubric;
+}
+
+// ══════════════════════════════════════════
+// Helpers
+// ══════════════════════════════════════════
+function clearMemo() {
+  ['A','B','C','D','E','F','G','H','I','J','K','L'].forEach(s => {
+    document.getElementById('memo' + s).value = '';
+  });
+}
+
+function newRep() {
+  repCount++;
+  document.getElementById('repCounter').textContent = `Rep #${repCount}`;
+  clearMemo();
+  currentCaseText = '';
+  resetTimer();
+  ['caseSection','memoSection','feedbackSection','goldSection','redTeamSection','drillsSection'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('feedbackContent').textContent = '';
+  setPhase(1);
+  // Alternate stage
+  const alt = selectedStage === 'Seed' ? 'Series A' : 'Seed';
+  const btn = document.querySelector(`[data-stage="${alt}"]`);
+  if (btn) selectStage(btn);
+  document.getElementById('generateSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function toggleCollapsible(btn) {
+  btn.classList.toggle('open');
+  btn.nextElementSibling.classList.toggle('open');
+}
+</script>
+</body>
+</html>
