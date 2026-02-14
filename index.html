@@ -1765,6 +1765,7 @@ function generateCase() {
 
   currentCaseText = chosen.text;
   document.getElementById('caseContent').textContent = chosen.text;
+  document.getElementById('generateSection').style.display = 'none';
   document.getElementById('caseSection').style.display = 'block';
   setPhase(1);
 
@@ -1773,6 +1774,7 @@ function generateCase() {
 
 function showMemo() {
   document.getElementById('memoSection').style.display = 'block';
+  document.querySelector('#caseSection .btn-primary').style.display = 'none';
   setPhase(2);
   resetTimer();
   startTimer();
@@ -1916,13 +1918,15 @@ Three targeted 2-minute exercises.`;
         if (drillsMatch) { document.getElementById('drillsSection').style.display = 'block'; document.getElementById('drillsContent').textContent = drillsMatch[0].trim(); }
       }
     } catch (e) {
-      document.getElementById('feedbackContent').textContent = 'API Error: ' + e.message + '\n\nFalling back to self-assessment mode.';
       showSelfAssessment(memoText);
+      const fc = document.getElementById('feedbackContent');
+      fc.textContent = 'AI scoring failed (' + e.message + '). Using self-assessment rubric.\n\n' + fc.textContent;
     }
 
     btn.disabled = false;
     btn.innerHTML = 'Submit for Scoring';
   } else {
+    document.getElementById('submitBtn').disabled = true;
     showSelfAssessment(memoText);
   }
 
@@ -2049,7 +2053,17 @@ function newRep() {
   ['caseSection','memoSection','feedbackSection','goldSection','redTeamSection','drillsSection'].forEach(id => {
     document.getElementById(id).style.display = 'none';
   });
+  document.getElementById('generateSection').style.display = 'block';
+  const startMemoBtn = document.querySelector('#caseSection .btn-primary');
+  if (startMemoBtn) startMemoBtn.style.display = '';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').innerHTML = 'Submit for Scoring';
   document.getElementById('feedbackContent').textContent = '';
+  document.getElementById('goldContent').textContent = '';
+  document.getElementById('redTeamContent').textContent = '';
+  document.getElementById('drillsContent').textContent = '';
+  document.querySelectorAll('.collapsible-toggle.open').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('.collapsible-body.open').forEach(el => el.classList.remove('open'));
   setPhase(1);
   // Alternate stage
   const alt = selectedStage === 'Seed' ? 'Series A' : 'Seed';
